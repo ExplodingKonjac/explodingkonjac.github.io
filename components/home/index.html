@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="%SITE_DESCRIPTION%" />
+    <meta name="theme-color" content="#f6f5f0" />
+    <meta property="og:title" content="%SITE_NAME%" />
+    <meta property="og:description" content="%SITE_DESCRIPTION%" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="%SITE_CANONICAL%" />
+    <link rel="canonical" href="%SITE_CANONICAL%" />
+    <title>%SITE_NAME% — personal notebook</title>
+    <script type="module" src="/src/main.js"></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <div class="shell">
+      <header>
+        <a class="wordmark" href="%HOME_URL%"
+          >%SITE_NAME%<span aria-hidden="true">.</span></a
+        ><a class="external" href="%SITE_GITHUB%">GitHub ↗</a>
+      </header>
+      <main id="main">
+        <section class="intro" aria-labelledby="intro-title">
+          <p class="eyebrow">A PERSONAL NOTEBOOK</p>
+          <h1 id="intro-title">
+            Notes, proofs &amp;<br />things I build<span>.</span>
+          </h1>
+          <p class="lede">
+            I'm %SITE_NAME%. This is my corner of the web for mathematics,
+            algorithms, technology, and small experiments.
+          </p>
+        </section>
+        <section class="projects" aria-labelledby="projects-title">
+          <div class="section-heading">
+            <h2 id="projects-title">Explore</h2>
+            <span>WRITING &amp; PROJECTS</span>
+          </div>
+          %COMPONENT_LINKS%
+        </section>
+      </main>
+      <footer>
+        <span>A work in progress, by design.</span
+        ><a href="%BLOG_RSS%">Follow the writing via RSS ↗</a>
+      </footer>
+    </div>
+  </body>
+</html>

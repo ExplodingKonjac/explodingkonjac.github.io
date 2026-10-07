@@ -1,0 +1,20 @@
+---
+import Base from '../layouts/Base.astro';
+import PostList from '../components/PostList.astro';
+import { publishedPosts } from '../lib/posts';
+const posts = await publishedPosts();
+---
+
+<Base
+  title="Blog"
+  description="Notes on mathematics, algorithms, and technology."
+>
+  <div class="page-heading">
+    <p class="eyebrow">THE NOTEBOOK</p>
+    <h1>
+      Thinking in writing<span>.</span>
+    </h1>
+    <p>Mathematics, algorithms, and technology. Ideas worth working through.</p>
+  </div>
+  <PostList posts={posts} />
+</Base>

@@ -1,0 +1,8 @@
+pnpm-lock.yaml
+components/app/maimai-renderer/index.html
+node_modules
+dist
+_site
+.astro
+playwright-report
+test-results

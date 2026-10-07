@@ -1,0 +1,11 @@
+{
+  "name": "@site/config",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./index.mjs"
+  },
+  "scripts": {
+    "check": "node --check index.mjs"
+  }
+}

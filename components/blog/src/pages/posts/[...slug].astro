@@ -1,0 +1,79 @@
+---
+import { render, type CollectionEntry } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import { publishedPosts, tagUrl, formatDate } from '../../lib/posts';
+
+export async function getStaticPaths() {
+  return (await publishedPosts()).map((post) => ({
+    params: { slug: post.id },
+    props: { post },
+  }));
+}
+interface Props {
+  post: CollectionEntry<'posts'>;
+}
+const { post } = Astro.props;
+const { Content, headings } = await render(post);
+const contents = headings.filter(
+  (heading) => heading.depth === 2 || heading.depth === 3,
+);
+---
+
+<Base
+  title={post.data.title}
+  description={post.data.description}
+  article
+  pubDate={post.data.pubDate}
+  updatedDate={post.data.updatedDate}
+  draft={post.data.draft}
+>
+  <article>
+    <div class="page-heading article-heading">
+      <p class="eyebrow">A NOTE FROM THE NOTEBOOK</p>
+      <h1>{post.data.title}</h1>
+      <p>{post.data.description}</p>
+      <div class="post-date">
+        <time datetime={post.data.pubDate.toISOString()}>
+          {formatDate(post.data.pubDate)}
+        </time>
+        {post.data.updatedDate && (
+          <span>
+            Updated{' '}
+            <time datetime={post.data.updatedDate.toISOString()}>
+              {formatDate(post.data.updatedDate)}
+            </time>
+          </span>
+        )}
+        {post.data.draft && (
+          <span class="draft-badge">Draft · local preview</span>
+        )}
+      </div>
+      <ul class="tags" aria-label="Post tags">
+        {post.data.tags.map((tag) => (
+          <li>
+            <a href={tagUrl(tag)}>{tag}</a>
+          </li>
+        ))}
+      </ul>
+    </div>
+    <div class="article-grid">
+      {contents.length > 0 && (
+        <aside class="toc">
+          <nav aria-label="On this page">
+            <h2>On this page</h2>
+            <ol>
+              {contents.map((heading) => (
+                <li class:list={{ 'toc-nested': heading.depth === 3 }}>
+                  <a href={`#${heading.slug}`}>{heading.text}</a>
+                </li>
+              ))}
+            </ol>
+          </nav>
+        </aside>
+      )}
+      <div class="prose">
+        <Content />
+      </div>
+    </div>
+  </article>
+</Base>

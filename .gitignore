@@ -1,0 +1,14 @@
+node_modules/
+dist/
+_site/
+.astro/
+.pnpm-store/
+.cache/
+coverage/
+playwright-report/
+test-results/
+.env
+.env.*
+!.env.example
+*.tsbuildinfo
+.DS_Store

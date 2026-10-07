@@ -1,0 +1,33 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { postUrl, tagUrl, formatDate } from '../lib/posts';
+interface Props {
+  posts: CollectionEntry<'posts'>[];
+}
+const { posts } = Astro.props;
+---
+
+<ol class="post-list">
+  {posts.map((post) => (
+    <li>
+      <div class="post-date">
+        <time datetime={post.data.pubDate.toISOString()}>
+          {formatDate(post.data.pubDate)}
+        </time>
+        {post.data.draft && <span class="draft-badge">Draft</span>}
+      </div>
+      <h2>
+        <a href={postUrl(post)}>{post.data.title}</a>
+      </h2>
+      <p>{post.data.description}</p>
+      <ul class="tags" aria-label="Post tags">
+        {post.data.tags.map((tag) => (
+          <li>
+            <a href={tagUrl(tag)}>{tag}</a>
+          </li>
+        ))}
+      </ul>
+    </li>
+  ))}
+</ol>
+{posts.length === 0 && <p>No published notes yet.</p>}
