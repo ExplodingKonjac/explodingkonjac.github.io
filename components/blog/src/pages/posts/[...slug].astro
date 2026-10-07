@@ -33,8 +33,8 @@ const contents = headings.filter(
     <div class="page-heading article-heading glass" data-post-key={post.id}>
       <GlassSurface />
       <p class="eyebrow">A NOTE FROM THE NOTEBOOK</p>
-      <h1>{post.data.title}</h1>
-      <p>{post.data.description}</p>
+      <h1 data-post-title>{post.data.title}</h1>
+      <p data-post-description>{post.data.description}</p>
       <div class="post-date">
         <time datetime={post.data.pubDate.toISOString()}>
           {formatDate(post.data.pubDate)}

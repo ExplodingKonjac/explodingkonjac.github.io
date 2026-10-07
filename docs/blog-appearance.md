@@ -66,31 +66,136 @@ apply the theme before a page appears.
 
 Material, color, spacing, and type tokens are in `src/styles/global.css`. `.glass`
 contains a decorative `GlassSurface`; `.glass-clear` is used for navigation and the
-ToC, and `.glass-reading` for articles. Keep text outside the decorative surface so
-navigation can transform the surface without scaling the text. Transparency and
-contrast preferences, forced colors, missing backdrop-filter support, and printing
-have dedicated fallbacks. Authored figures are never recolored.
+ToC, and `.glass-reading` keeps a denser film for article legibility. The other
+surfaces deliberately let substantially more wallpaper show through.
+
+To adjust glass opacity, edit the percentage after `/` in these color tokens in
+`components/blog/src/styles/global.css`:
+
+| Token             | Surfaces                               | Light | Dark |
+| ----------------- | -------------------------------------- | ----- | ---- |
+| `--glass`         | Headings, summaries, tag tiles, footer | 30%   | 30%  |
+| `--clear-glass`   | Navbar and table of contents           | 20%   | 20%  |
+| `--reading-glass` | Article body                           | 75%   | 75%  |
+
+Lower percentages make the fill more transparent. Light values live in `:root`;
+dark values live in `:root[data-theme='dark']` and are repeated in the
+`prefers-color-scheme: dark` block for visitors without JavaScript. Keep those two
+dark blocks in sync. Change the color alpha rather than the element's `opacity`,
+which would also fade text and alter backdrop compositing. `--shine` controls the
+subtle surface highlight and `--scrim` controls the wallpaper overlay independently.
+Rebuild to see configuration and stylesheet changes in the production preview.
+
+Tag pills, the theme button, and the active navigation tab use separate
+`--control-fill`, `--control-hover`, `--control-border`, `--control-highlight`, and
+`--control-shadow` tokens. Their light translucent tint, single illuminated rim,
+and faint ambient shadow keep them consistent with the larger glass surfaces.
+Pressing a control softens the rim and adds a subtle inset shade without moving
+its hit target. Tag links retain 44px hit areas.
+
+Selection groups use one shared glass pill, which slides to the hovered or
+keyboard-focused item over 280ms and returns to the active item when interaction
+leaves the group. The navbar keeps the same pill across routes and continuously
+aligns it while docking or resizing. Reduced motion moves it immediately; without
+JavaScript, the active link keeps its static glass treatment. To reuse this
+behavior, mark a group with `data-pill-group`, mark its controls with
+`data-pill-item`, and set their active state with `aria-current`, `aria-selected`,
+or `aria-pressed`. Behavior lives in `src/scripts/selection-pill.ts`.
+
+`src/scripts/glass.ts` generates a rounded-rectangle displacement map for each
+surface. In Chromium, an SVG backdrop filter bends background pixels within an
+18px edge band. Blur rises continuously from a lightly diffused rim to the full
+center setting, using a smooth distance mask that follows the rounded outline.
+The default ramp reaches full blur 64px inward, capped at half the shorter card
+dimension so small controls still have a frosted center. A single
+[composited backdrop](https://developer.mozilla.org/en-US/docs/Web/SVG/Reference/Element/feComposite)
+blends the blur levels before refraction; the tint and border stay continuous.
+Foreground text is outside the filter. Maps follow resized cards and the navbar's
+changing corner radius, and filters are reclaimed after navigation.
+
+These tokens in `src/styles/global.css` control the optics independently of opacity:
+
+- `--blur: 8px` controls the maximum center blur (mobile overrides it to `2px`,
+  navbar to `8px`). It does not change refraction strength.
+- `--blur-edge-ratio: 0.25` sets rim blur as a fraction of the center value. With
+  an `8px` center, the rim starts at `2px`. Use `1` to restore uniform blur.
+- `--blur-ramp: 64px` sets the distance over which the blur smoothly increases.
+  Increase it for a broader transition; it is capped to fit each surface.
+- `--refraction-strength: 32` controls how far background pixels bend. Increase it
+  for stronger refraction; `0` disables displacement.
+- `--refraction-width: 18px` controls how far the curved edge extends into the card.
+  Displacement returns smoothly to zero at its inner boundary.
+
+Optical settings are read during initial layout, resizing, and route preparation.
+Rebuild/reload after changing stylesheet values. The navbar uses stronger
+diffusion so underlying article text doesn't compete with its controls.
+
+Firefox and Safari/WebKit currently use the same translucent tint, fine highlights,
+and ordinary backdrop diffusion because SVG backdrop displacement is not rendered
+consistently by those engines. Reduced transparency, increased contrast and forced
+colors use opaque materials. Authored figures are never recolored.
 
 ## Navigation and motion
 
-Astro's ClientRouter enhances the existing static pages. The background and header
-persist; active navigation is updated after each swap. Only a visible selected
-post surface is paired with its article header. The source name is applied after
-the destination loads but before the outgoing snapshot. Text fades independently,
-followed by the body and ToC. A recent history entry can reverse the transition
-when both endpoints fit the viewport. Other routes, hash destinations, and clipped
-cards use the simpler transition. Astro retains ownership of history and scroll
-restoration. RSS and external links use ordinary browser navigation.
+Astro's ClientRouter owns fetching, history, URLs and scroll restoration. The
+wallpaper, navbar, optical filter definitions and temporary flight layer persist.
+Native bitmap view transitions are skipped: flattened snapshots and fading an
+ancestor of a backdrop filter can change the sampled background and cause a material
+pop. Instead, each live glass surface and each text layer animate independently.
 
-Motion timings live in `src/styles/motion.css`. Reduced motion removes movement and
-staggering; browsers without View Transitions use a short fallback fade. Same-page
-anchors keep their URLs, with an offset measured from the sticky header.
+After the next document is ready, outgoing layers visibly fade over 220ms before
+HTML is swapped. Incoming surfaces fade in place, while their text settles by 6px.
+For a visible matching post, a live glass surface travels to the destination's
+geometry over 420ms, carrying its title, description, and tag pills. Single-line
+text changes typography directly; wrapped text blends between two fixed layouts
+along the same path, so line breaks do not jump while the card grows. The date
+crossfades between its different positions instead of crossing the title. The
+eyebrow, article body and ToC follow in sequence. This works
+for Blog/wordmark links as well as browser history. Missing or clipped endpoints
+use the short fade. Rapid navigation cancels and cleans up the previous sequence.
+No card ancestor animates opacity, and the material uses its final tint from its
+first visible frame. Reduced motion removes animation and delay.
+
+The native post link covers the overview card's empty space as well as its title.
+Tag links retain separate hit areas, and modified clicks use normal browser
+navigation. Moving content copies are inert and hidden from assistive technology;
+keyboard focus moves to the real heading after the animation handoff.
+
+On Tags, a tile and its category header share a stable `data-tag-key`. Once the
+surrounding cards have faded, the selected glass moves upward and expands over
+420ms. Its label moves with it and changes font size, spacing, and line height
+directly, keeping the text sharp. The count fades out; the header eyebrow and
+post list enter as the panel settles. Returning to Tags reverses the transition
+and browser history restores focus to the originating tile. Labels that wrap
+crossfade at their final typography to avoid line-break jumps. Keyboard focus
+waits for the real heading to replace the moving label; reduced motion skips the
+flight, and interrupted navigation removes all temporary layers.
+
+`src/scripts/navbar.ts` maps the first 120px of scroll to a continuous dock progress.
+The floating panel widens to the viewport, reaches the top edge and straightens
+its corners without replacing the element or changing its blur or tint. Its top,
+left, and right rim highlights and refraction fade with the docking progress.
+When fully docked, only the bottom edge refracts and starts the blur gradient;
+the top and sides remain fully frosted. Scrolling back restores the full floating
+outline and its surrounding gradient. Desktop
+contents spread toward the outer margins. On mobile, the theme button moves to
+the upper row before the navigation links expand into the space it leaves. The
+flow slot retains its height so reshaping cannot move the document underneath it.
+Route-driven scroll restoration eases the persistent bar to its new geometry;
+anchor offsets follow its actual dimensions.
+At the top, the panel aligns with the current page's centered content shell;
+its measurements are refreshed from the new shell after each Astro swap.
+
+Motion behavior lives in `src/scripts/navigation.ts`; `src/styles/motion.css`
+contains its layer and visibility rules. RSS, external links, modified clicks,
+and no-JavaScript navigation retain ordinary browser behavior.
 
 ## Verification
 
 Run `pnpm check`, `pnpm build`, `pnpm verify`, and `pnpm test:browser`. Playwright's
 browser tests mock image APIs and exercise navigation, themes, failure states,
-responsive layouts, and no-JavaScript behavior. Desktop and mobile screenshots are
+responsive layouts, live exit/entrance material, collision-free navbar docking,
+actual edge displacement pixels, and no-JavaScript behavior. Desktop and mobile screenshots are
 saved in ignored test output directories for visual review. CI uses Chromium.
 For additional engines, set `BLOG_TEST_BROWSER=firefox` or `BLOG_TEST_BROWSER=webkit`
 when running `pnpm test:browser` after installing the corresponding Playwright browser.

@@ -52,7 +52,7 @@ const tagsActive = Astro.url.pathname.startsWith(componentUrl('blog', 'tags'));
           theme === 'dark' ? '#141d30' : '#e3eaf5';
       })();
     </script>
-    <ClientRouter fallback="animate" />
+    <ClientRouter fallback="swap" />
     <meta property="og:title" content={pageTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
@@ -79,71 +79,94 @@ const tagsActive = Astro.url.pathname.startsWith(componentUrl('blog', 'tags'));
   </head>
   <body>
     <Background />
+    <svg
+      id="glass-filters"
+      class="glass-filter-defs"
+      aria-hidden="true"
+      transition:persist="glass-filters"
+    >
+      <defs />
+    </svg>
+    <div
+      id="glass-flight-layer"
+      aria-hidden="true"
+      transition:persist="glass-flight-layer"
+    ></div>
     <a href="#main" class="skip-link">
       Skip to content
     </a>
     <div class="shell">
-      <header
-        class="site-header glass glass-clear"
-        transition:name="blog-header"
-        transition:persist="blog-header"
-        transition:animate="none"
-      >
-        <GlassSurface />
-        <a href={componentUrl('blog')} class="wordmark">
-          {site.name}
-          <span aria-hidden="true">.</span>
-        </a>
-        <div class="header-controls">
-          <nav aria-label="Main navigation">
-            <a
-              href={componentUrl('blog')}
-              data-nav="blog"
-              aria-current={!tagsActive ? 'page' : undefined}
-            >
-              Blog
+      <div class="header-slot">
+        <header
+          class="site-header glass glass-clear"
+          transition:name="blog-header"
+          transition:persist="blog-header"
+          transition:animate="none"
+        >
+          <GlassSurface />
+          <div class="header-inner">
+            <a href={componentUrl('blog')} class="wordmark">
+              {site.name}
+              <span aria-hidden="true">.</span>
             </a>
-            <a
-              href={componentUrl('blog', 'tags')}
-              data-nav="tags"
-              aria-current={tagsActive ? 'page' : undefined}
-            >
-              Tags
-            </a>
-            <a href={componentUrl('blog', 'rss.xml')} data-astro-reload>
-              RSS
-            </a>
-          </nav>
-          <button
-            class="theme-toggle"
-            type="button"
-            aria-label="Switch to dark mode"
-            hidden
-          >
-            <svg
-              class="icon-sun"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.6"
-              aria-hidden="true"
-            >
-              <circle cx="12" cy="12" r="4" />
-              <path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42" />
-            </svg>
-            <svg
-              class="icon-moon"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.6"
-              aria-hidden="true"
-            >
-              <path d="M20.5 13.5A8.8 8.8 0 0 1 10.5 3.5 8.8 8.8 0 1 0 20.5 13.5Z" />
-            </svg>
-          </button>
-        </div>
-      </header>
+            <div class="header-controls">
+              <nav aria-label="Main navigation" data-pill-group>
+                <a
+                  href={componentUrl('blog')}
+                  data-nav="blog"
+                  data-pill-item
+                  aria-current={!tagsActive ? 'page' : undefined}
+                >
+                  Blog
+                </a>
+                <a
+                  href={componentUrl('blog', 'tags')}
+                  data-nav="tags"
+                  data-pill-item
+                  aria-current={tagsActive ? 'page' : undefined}
+                >
+                  Tags
+                </a>
+                <a
+                  href={componentUrl('blog', 'rss.xml')}
+                  data-astro-reload
+                  data-pill-item
+                >
+                  RSS
+                </a>
+              </nav>
+              <button
+                class="theme-toggle"
+                type="button"
+                aria-label="Switch to dark mode"
+                hidden
+              >
+                <svg
+                  class="icon-sun"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.6"
+                  aria-hidden="true"
+                >
+                  <circle cx="12" cy="12" r="4" />
+                  <path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42" />
+                </svg>
+                <svg
+                  class="icon-moon"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.6"
+                  aria-hidden="true"
+                >
+                  <path d="M20.5 13.5A8.8 8.8 0 0 1 10.5 3.5 8.8 8.8 0 1 0 20.5 13.5Z" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </header>
+      </div>
       <div class="page-stage">
         <main id="main" data-page={article ? 'post' : 'listing'} tabindex="-1">
           <slot />
@@ -156,6 +179,8 @@ const tagsActive = Astro.url.pathname.startsWith(componentUrl('blog', 'tags'));
     </div>
     <script>
       import '../scripts/appearance';
+      import '../scripts/navbar';
+      import '../scripts/selection-pill';
       import '../scripts/navigation';
     </script>
   </body>

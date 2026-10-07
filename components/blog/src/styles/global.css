@@ -3,24 +3,37 @@
 :root {
   color-scheme: light;
   --ink: #202d45;
-  --muted: #3c4b64;
-  --accent: #264a7c;
+  --muted: #324058;
+  --accent: #20406a;
   --line: rgb(63 85 121 / 15%);
   --inset: rgb(137 157 190 / 11%);
-  --glass: rgb(247 250 255 / 68%);
-  --clear-glass: rgb(243 248 255 / 64%);
-  --reading-glass: rgb(249 251 255 / 86%);
+  /* Glass fill opacity: lower the percentage for more transparency. */
+  --glass: rgb(247 250 255 / 50%);
+  --clear-glass: rgb(243 248 255 / 25%);
+  --reading-glass: rgb(249 251 255 / 75%);
   --opaque: #f1f5fc;
-  --rim: rgb(255 255 255 / 86%);
+  --rim: rgb(255 255 255 / 62%);
   --rim-shade: rgb(111 134 177 / 22%);
-  --shine: rgb(255 255 255 / 42%);
+  --shine: rgb(255 255 255 / 12%);
   --shadow:
     0 12px 36px -12px rgb(49 70 116 / 17%), 0 2px 6px rgb(49 70 116 / 3%);
-  --scrim: rgb(228 236 248 / 36%);
+  --scrim: rgb(228 236 248 / 26%);
   --active: rgb(255 255 255 / 68%);
+  /* Controls share the cards' translucent tint and a single illuminated rim. */
+  --control-fill: rgb(247 251 255 / 24%);
+  --control-hover: rgb(255 255 255 / 38%);
+  --control-border: rgb(83 106 143 / 22%);
+  --control-highlight: rgb(255 255 255 / 60%);
+  --control-shadow: 0 3px 10px -5px rgb(36 54 89 / 16%);
   --warning: #935123;
   --radius: 28px;
-  --blur: 24px;
+  --blur: 8px;
+  /* Blur eases from 25% at the rim to full strength across this distance. */
+  --blur-edge-ratio: 0.25;
+  --blur-ramp: 64px;
+  /* Refraction geometry stays independent of the blur gradient. */
+  --refraction-strength: 32;
+  --refraction-width: 18px;
   --gap: 24px;
   --header-height: 76px;
   --header-top: max(20px, env(safe-area-inset-top));
@@ -35,20 +48,25 @@
 :root[data-theme='dark'] {
   color-scheme: dark;
   --ink: #edf2fc;
-  --muted: #b3c0d7;
+  --muted: #c0cce0;
   --accent: #a8c9ff;
   --line: rgb(198 216 248 / 16%);
   --inset: rgb(154 184 232 / 9%);
-  --glass: rgb(22 32 52 / 72%);
-  --clear-glass: rgb(27 39 62 / 66%);
-  --reading-glass: rgb(20 29 47 / 90%);
+  --glass: rgb(22 32 52 / 50%);
+  --clear-glass: rgb(27 39 62 / 25%);
+  --reading-glass: rgb(20 29 47 / 75%);
   --opaque: #1c2940;
   --rim: rgb(207 224 255 / 25%);
   --rim-shade: rgb(6 13 28 / 45%);
   --shine: rgb(196 215 255 / 7%);
   --shadow: 0 16px 44px -12px rgb(4 10 25 / 35%), 0 2px 8px rgb(4 10 25 / 8%);
-  --scrim: rgb(10 18 38 / 73%);
+  --scrim: rgb(10 18 38 / 60%);
   --active: rgb(175 202 244 / 14%);
+  --control-fill: rgb(112 144 196 / 14%);
+  --control-hover: rgb(150 180 224 / 24%);
+  --control-border: rgb(190 213 249 / 24%);
+  --control-highlight: rgb(223 237 255 / 36%);
+  --control-shadow: 0 3px 10px -5px rgb(3 9 21 / 28%);
   --warning: #f1bd94;
   background: #141d30;
 }
@@ -57,20 +75,25 @@
   :root:not([data-theme]) {
     color-scheme: dark;
     --ink: #edf2fc;
-    --muted: #b3c0d7;
+    --muted: #c0cce0;
     --accent: #a8c9ff;
     --line: rgb(198 216 248 / 16%);
     --inset: rgb(154 184 232 / 9%);
-    --glass: rgb(22 32 52 / 72%);
-    --clear-glass: rgb(27 39 62 / 66%);
-    --reading-glass: rgb(20 29 47 / 90%);
+    --glass: rgb(22 32 52 / 30%);
+    --clear-glass: rgb(27 39 62 / 20%);
+    --reading-glass: rgb(20 29 47 / 62%);
     --opaque: #1c2940;
     --rim: rgb(207 224 255 / 25%);
     --rim-shade: rgb(6 13 28 / 45%);
     --shine: rgb(196 215 255 / 7%);
     --shadow: 0 16px 44px -12px rgb(4 10 25 / 35%);
-    --scrim: rgb(10 18 38 / 73%);
+    --scrim: rgb(10 18 38 / 60%);
     --active: rgb(175 202 244 / 14%);
+    --control-fill: rgb(112 144 196 / 14%);
+    --control-hover: rgb(150 180 224 / 24%);
+    --control-border: rgb(190 213 249 / 24%);
+    --control-highlight: rgb(223 237 255 / 36%);
+    --control-shadow: 0 3px 10px -5px rgb(3 9 21 / 28%);
     --warning: #f1bd94;
     background: #141d30;
   }
@@ -161,12 +184,15 @@ a:hover {
   border: 1px solid var(--rim);
   border-bottom-color: var(--rim-shade);
   border-right-color: var(--rim-shade);
-  box-shadow:
-    var(--shadow),
-    inset 0 1px 0 var(--rim),
-    inset 0 -1px 0 var(--rim-shade);
+  /* One continuous rim follows the lens boundary, without a second inset outline. */
+  box-shadow: var(--shadow);
   -webkit-backdrop-filter: blur(var(--blur)) saturate(135%);
   backdrop-filter: blur(var(--blur)) saturate(135%);
+}
+.glass-surface[data-refractive] {
+  /* A lightly blurred base graduates to center frost before refraction. */
+  backdrop-filter: blur(var(--blur-base, var(--blur))) var(--refraction)
+    saturate(135%);
 }
 .glass > :not(.glass-surface) {
   position: relative;
@@ -222,14 +248,11 @@ h1 > span {
   font-size: 13px;
   font-weight: 550;
   border-radius: 999px;
+  border: 1px solid transparent;
   text-decoration: none;
 }
 .site-header nav a[aria-current] {
-  background: var(--active);
   color: var(--ink);
-  box-shadow:
-    inset 0 1px 0 var(--rim),
-    0 2px 8px rgb(40 60 100 / 4%);
 }
 .theme-toggle {
   width: 44px;
@@ -237,8 +260,6 @@ h1 > span {
   flex-shrink: 0;
   display: grid;
   place-items: center;
-  background: var(--inset);
-  border: 1px solid var(--line);
   border-radius: 50%;
   color: var(--ink);
   cursor: pointer;
@@ -273,13 +294,13 @@ h1 > span {
   margin: 0 0 24px;
 }
 h1 {
-  text-wrap: balance;
+  text-wrap: wrap;
   font-size: clamp(34px, 4.4vw, 54px);
   font-weight: 550;
   line-height: 1.15;
   letter-spacing: -2px;
   margin: 0;
-  max-width: 24ch;
+  max-width: none;
   overflow-wrap: anywhere;
 }
 .page-heading > p:not(.eyebrow) {
@@ -301,6 +322,8 @@ h1 {
   gap: var(--gap);
 }
 .post-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
   padding: 30px 40px;
   transition: transform 160ms var(--ease);
 }
@@ -319,15 +342,39 @@ h1 {
   letter-spacing: -0.9px;
   margin: 14px 0 12px;
 }
+.glass.post-card > h2 {
+  /* A grid item can sit above the glass without becoming the stretched link's
+     containing block, so the card keeps its full native click area. */
+  position: static;
+  z-index: 1;
+}
 .post-link {
-  display: flex;
-  align-items: start;
-  justify-content: space-between;
-  gap: 24px;
+  display: block;
+  position: static;
+  width: 100%;
   color: var(--ink);
   text-decoration: none;
+  overflow-wrap: anywhere;
 }
-.post-arrow {
+.post-link::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: var(--radius);
+}
+/* Keep the native post link across the card, with tag links above its hit area. */
+.post-card > .tags {
+  z-index: 2;
+  pointer-events: none;
+}
+.post-card .tags a {
+  pointer-events: auto;
+}
+.post-card > .post-arrow {
+  position: absolute;
+  right: 40px;
+  top: 26px;
   flex-shrink: 0;
   font-size: 25px;
   font-weight: 400;
@@ -355,18 +402,17 @@ h1 {
   min-height: 44px;
   padding: 0 13px;
   font-size: 11px;
-  font-weight: 500;
+  font-weight: 550;
   text-decoration: none;
   border-radius: 999px;
-  color: var(--muted);
+  color: var(--ink);
 }
 .tags a::before {
   content: '';
   position: absolute;
   inset: 7px 0;
   border-radius: inherit;
-  background: var(--inset);
-  border: 1px solid var(--line);
+  pointer-events: none;
   z-index: -1;
 }
 .tags li {
@@ -374,6 +420,42 @@ h1 {
   max-width: 100%;
   position: relative;
   isolation: isolate;
+}
+.tags a::before,
+.theme-toggle,
+.selection-pill,
+.site-header nav:not([data-pill-ready]) a[aria-current] {
+  background:
+    linear-gradient(145deg, var(--shine), transparent 65%), var(--control-fill);
+  border: 1px solid var(--control-border);
+  border-top-color: var(--control-highlight);
+  box-shadow: var(--control-shadow);
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease,
+    color 180ms ease,
+    box-shadow 160ms ease;
+}
+[data-pill-group] {
+  position: relative;
+}
+[data-pill-item] {
+  position: relative;
+  z-index: 1;
+}
+.selection-pill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 0;
+  border-radius: 999px;
+  pointer-events: none;
+  -webkit-backdrop-filter: blur(4px) saturate(115%);
+  backdrop-filter: blur(4px) saturate(115%);
+}
+[data-pill-ready]:has([data-pill-item]:active) > .selection-pill {
+  border-top-color: var(--control-border);
+  box-shadow: inset 0 1px 2px var(--line);
 }
 .draft-badge {
   color: var(--accent);
@@ -413,7 +495,7 @@ h1 {
   font-size: 12px;
 }
 .article-heading h1 {
-  max-width: 26ch;
+  max-width: none;
 }
 .article-heading .post-date {
   margin-top: 24px;
@@ -663,8 +745,7 @@ figcaption {
 }
 [data-theme-ready] .glass-surface,
 [data-theme-ready] .wallpaper-scrim,
-[data-theme-ready] body,
-[data-theme-ready] .theme-toggle {
+[data-theme-ready] body {
   transition:
     background-color 180ms ease,
     color 180ms ease,
@@ -680,9 +761,12 @@ figcaption {
   .toc a:hover {
     color: var(--accent);
   }
+  .tags a:hover::before,
   .theme-toggle:hover,
-  .site-header nav a:hover {
-    background: var(--active);
+  .site-header nav:not([data-pill-ready]) a:hover {
+    background-color: var(--control-hover);
+    border-color: var(--control-border);
+    border-top-color: var(--control-highlight);
     color: var(--ink);
   }
 }
@@ -690,9 +774,17 @@ figcaption {
 .tag-index a:active {
   transform: none;
 }
-.theme-toggle:active {
-  background: var(--active);
-  box-shadow: inset 0 2px 4px var(--line);
+.tags a:focus-visible::before,
+.theme-toggle:focus-visible {
+  background-color: var(--control-hover);
+  border-color: var(--accent);
+}
+.tags a:active::before,
+.theme-toggle:active,
+.site-header nav:not([data-pill-ready]) a:active {
+  background-color: var(--control-hover);
+  border-top-color: var(--control-border);
+  box-shadow: inset 0 1px 2px var(--line);
 }
 @media (max-width: 959px) {
   .article-grid {
@@ -743,7 +835,7 @@ figcaption {
   :root {
     --radius: 22px;
     --gap: 16px;
-    --blur: 16px;
+    --blur: 2px;
     --header-top: max(12px, env(safe-area-inset-top));
     --header-height: 120px;
   }
@@ -802,7 +894,9 @@ figcaption {
   .post-link {
     gap: 12px;
   }
-  .post-arrow {
+  .post-card > .post-arrow {
+    right: 24px;
+    top: 20px;
     font-size: 21px;
   }
   .post-card p {
@@ -847,12 +941,24 @@ figcaption {
 @supports not (
   (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))
 ) {
-  .glass-surface {
+  .glass-surface,
+  .glass-surface[data-refractive] {
     background: var(--opaque);
   }
 }
 @media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
-  .glass-surface {
+  .tags a::before,
+  .theme-toggle,
+  .selection-pill,
+  .site-header nav:not([data-pill-ready]) a[aria-current] {
+    background: var(--opaque);
+    border-color: var(--muted);
+    box-shadow: none;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+  .glass-surface,
+  .glass-surface[data-refractive] {
     background: var(--opaque);
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
@@ -860,10 +966,21 @@ figcaption {
   }
 }
 @media (forced-colors: active) {
+  .tags a::before,
+  .theme-toggle,
+  .selection-pill,
+  .site-header nav:not([data-pill-ready]) a[aria-current] {
+    background: ButtonFace;
+    border-color: ButtonText;
+    box-shadow: none;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
   .wallpaper {
     display: none;
   }
-  .glass-surface {
+  .glass-surface,
+  .glass-surface[data-refractive] {
     background: Canvas;
     border: 1px solid CanvasText;
     box-shadow: none;
@@ -936,4 +1053,96 @@ figcaption {
     color 180ms ease,
     background-color 180ms ease,
     border-color 180ms ease;
+}
+
+/* The slot preserves document flow while the same glass panel docks at the top. */
+.header-slot {
+  position: sticky;
+  top: var(--header-top);
+  height: 76px;
+  z-index: 20;
+}
+.site-header {
+  position: relative;
+  display: block;
+  top: 0;
+  padding: 0;
+  min-height: 0;
+  height: 76px;
+}
+.site-header[data-nav-ready] {
+  position: fixed;
+}
+.header-inner {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 calc(18px + 14px * var(--nav-progress, 0)) 0
+    calc(28px + 4px * var(--nav-progress, 0));
+}
+.site-header nav a {
+  color: var(--ink);
+}
+.site-header .glass-surface {
+  --blur: 8px;
+  --refraction-dock: var(--nav-progress, 0);
+  --free-edge: calc(100% * (1 - var(--nav-progress, 0)));
+  /* Border alpha follows scroll progress directly, without an extra theme delay. */
+  transition: background-color 180ms ease;
+  border-top-color: color-mix(
+    in srgb,
+    var(--rim) var(--free-edge),
+    transparent
+  );
+  border-left-color: color-mix(
+    in srgb,
+    var(--rim) var(--free-edge),
+    transparent
+  );
+  border-right-color: color-mix(
+    in srgb,
+    var(--rim-shade) var(--free-edge),
+    transparent
+  );
+  box-shadow: 0 6px 24px -12px rgb(30 50 90 / 24%);
+}
+@media (max-width: 600px) {
+  .header-slot,
+  .site-header {
+    height: 108px;
+  }
+  .site-header {
+    display: block;
+    padding: 0;
+  }
+  .header-inner {
+    display: block;
+    position: relative;
+    padding: 0;
+  }
+  .site-header .wordmark {
+    position: absolute;
+    top: calc(10px - 6px * var(--nav-progress, 0));
+    left: calc(
+      50% * (1 - var(--nav-progress, 0)) + 16px * var(--nav-progress, 0)
+    );
+    transform: translateX(calc(-50% * (1 - var(--nav-progress, 0))));
+    min-height: 40px;
+  }
+  .header-controls {
+    display: contents;
+  }
+  .site-header nav {
+    position: absolute;
+    left: 16px;
+    right: calc(64px - 48px * var(--nav-links-progress, 0));
+    bottom: calc(12px - 4px * var(--nav-progress, 0));
+  }
+  .site-header .theme-toggle {
+    position: absolute;
+    right: 16px;
+    top: calc(52px - 48px * var(--nav-button-progress, 0));
+  }
 }

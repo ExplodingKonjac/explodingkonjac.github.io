@@ -16,21 +16,21 @@ const { posts } = Astro.props;
       data-post-url={postUrl(post)}
     >
       <GlassSurface />
+      <span class="post-arrow" aria-hidden="true">
+        ↗
+      </span>
       <div class="post-date">
         <time datetime={post.data.pubDate.toISOString()}>
           {formatDate(post.data.pubDate)}
         </time>
         {post.data.draft && <span class="draft-badge">Draft</span>}
       </div>
-      <h2>
+      <h2 data-post-title>
         <a class="post-link" href={postUrl(post)}>
           {post.data.title}
-          <span class="post-arrow" aria-hidden="true">
-            ↗
-          </span>
         </a>
       </h2>
-      <p>{post.data.description}</p>
+      <p data-post-description>{post.data.description}</p>
       <ul class="tags" aria-label="Post tags">
         {post.data.tags.map((tag) => (
           <li>

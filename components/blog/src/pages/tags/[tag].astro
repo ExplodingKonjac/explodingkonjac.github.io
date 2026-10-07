@@ -14,10 +14,10 @@ const { tag, posts } = Astro.props;
 ---
 
 <Base title={`Tag: ${tag}`} description={`Notes about ${tag}.`}>
-  <div class="page-heading glass">
+  <div class="page-heading tag-heading glass" data-tag-key={tag}>
     <GlassSurface />
     <p class="eyebrow">BY TOPIC</p>
-    <h1>
+    <h1 data-tag-label>
       {tag}
       <span>.</span>
     </h1>

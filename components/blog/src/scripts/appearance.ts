@@ -141,19 +141,9 @@ async function loadBackground() {
 }
 
 const header = document.querySelector<HTMLElement>('.site-header');
-function measureHeader() {
-  if (header)
-    document.documentElement.style.setProperty(
-      '--header-height',
-      `${header.getBoundingClientRect().height}px`,
-    );
-}
-if (header) new ResizeObserver(measureHeader).observe(header);
-
 let pageController: AbortController | undefined;
 function initializePage() {
   applyTheme();
-  measureHeader();
   requestAnimationFrame(() => {
     document.documentElement.dataset.themeReady = '';
   });
@@ -173,7 +163,7 @@ function initializePage() {
   let current = '';
   const update = () => {
     frame = 0;
-    const offset = (header?.getBoundingClientRect().bottom ?? 0) + 28;
+    const offset = (header?.getBoundingClientRect().bottom ?? 0) + 64;
     const active = headings
       .filter((heading) => heading.getBoundingClientRect().top <= offset)
       .at(-1);
@@ -209,7 +199,6 @@ function initializePage() {
 
 document.addEventListener('astro:after-swap', () => {
   applyTheme();
-  measureHeader();
 });
 document.addEventListener('astro:page-load', initializePage);
 void loadBackground();

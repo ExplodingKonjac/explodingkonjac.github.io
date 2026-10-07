@@ -18,9 +18,9 @@ const tags = [...new Set(posts.flatMap((post) => post.data.tags))].sort();
   <ul class="tag-index">
     {tags.map((tag) => (
       <li>
-        <a class="glass" href={tagUrl(tag)}>
+        <a class="glass" href={tagUrl(tag)} data-tag-key={tag}>
           <GlassSurface />
-          <span>{tag}</span>
+          <span data-tag-label>{tag}</span>
           <span class="tag-count">
             {posts.filter((post) => post.data.tags.includes(tag)).length}
           </span>
