@@ -1,0 +1,25 @@
+---
+import { background, assetUrl, fallbackBackground } from '../config/appearance';
+const source = background.source;
+const initial =
+  source.kind === 'asset' ? assetUrl(source.src) : fallbackBackground;
+const noScriptSource = source.kind === 'image' ? source.url : initial;
+---
+
+<div
+  class="wallpaper"
+  aria-hidden="true"
+  data-background={JSON.stringify(background)}
+  data-fallback={fallbackBackground}
+  style={{ '--wallpaper-position': background.position }}
+  transition:name="blog-background"
+  transition:persist="blog-background"
+  transition:animate="none"
+>
+  <img class="wallpaper-base" src={initial} alt="" decoding="async" />
+  <img class="wallpaper-image" alt="" decoding="async" />
+  <noscript>
+    <img src={noScriptSource} alt="" />
+  </noscript>
+  <div class="wallpaper-scrim"></div>
+</div>

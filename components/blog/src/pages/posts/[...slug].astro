@@ -1,6 +1,8 @@
 ---
 import { render, type CollectionEntry } from 'astro:content';
 import Base from '../../layouts/Base.astro';
+import GlassSurface from '../../components/GlassSurface.astro';
+import TableOfContents from '../../components/TableOfContents.astro';
 import { publishedPosts, tagUrl, formatDate } from '../../lib/posts';
 
 export async function getStaticPaths() {
@@ -28,7 +30,8 @@ const contents = headings.filter(
   draft={post.data.draft}
 >
   <article>
-    <div class="page-heading article-heading">
+    <div class="page-heading article-heading glass" data-post-key={post.id}>
+      <GlassSurface />
       <p class="eyebrow">A NOTE FROM THE NOTEBOOK</p>
       <h1>{post.data.title}</h1>
       <p>{post.data.description}</p>
@@ -56,23 +59,15 @@ const contents = headings.filter(
         ))}
       </ul>
     </div>
-    <div class="article-grid">
-      {contents.length > 0 && (
-        <aside class="toc">
-          <nav aria-label="On this page">
-            <h2>On this page</h2>
-            <ol>
-              {contents.map((heading) => (
-                <li class:list={{ 'toc-nested': heading.depth === 3 }}>
-                  <a href={`#${heading.slug}`}>{heading.text}</a>
-                </li>
-              ))}
-            </ol>
-          </nav>
-        </aside>
-      )}
-      <div class="prose">
-        <Content />
+    <div
+      class:list={['article-grid', { 'without-toc': contents.length === 0 }]}
+    >
+      {contents.length > 0 && <TableOfContents headings={contents} />}
+      <div class="reading-card glass glass-reading">
+        <GlassSurface />
+        <div class="prose">
+          <Content />
+        </div>
       </div>
     </div>
   </article>

@@ -16,7 +16,9 @@ Components build to local `dist/`. The assembler validates every output before c
 
 The blog's navigation and sitemap stay within `/blog/`. Its wordmark links to the blog index, and its footer contains attribution without links to other components or profiles. The root robots file points to the blog's sitemap index.
 
-Astro uses `site` for the origin, `base` for `/blog/`, static output, directory-format pages and trailing slashes. Assets stay within each component's subtree. Authored images are colocated and processed by Astro. GitHub Pages has no general SPA rewrite service; future apps use static pages or hash routing.
+Astro uses `site` for the origin, `base` for `/blog/`, static output, directory-format pages and trailing slashes. Astro's ClientRouter enhances blog navigation with shared glass-surface transitions while retaining every generated static page. The wallpaper and navigation bar persist between blog routes; RSS uses ordinary document navigation. See [Blog appearance](blog-appearance.md) for theme, wallpaper, and motion configuration.
+
+Assets stay within each component's subtree. Authored images are colocated and processed by Astro. GitHub Pages has no general SPA rewrite service; future apps use static pages or hash routing.
 
 The preview server uses directory indexes, trailing-slash redirects and actual 404 responses. It never substitutes an app entry for an unknown route.
 

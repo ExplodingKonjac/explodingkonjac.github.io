@@ -33,6 +33,7 @@ pnpm test:browser          # Single-port navigation, app behavior and no hot rel
 
 ## Writing and extending
 
+- [Configure blog appearance](docs/blog-appearance.md): wallpaper sources, themes, glass surfaces, and motion.
 - [Write a post](docs/authoring.md): metadata, math, directives, illustrations and drafts.
 - [Add a component](docs/components.md): package contract, registry and routing.
 - [Architecture](docs/architecture.md): stack decisions and source-only policy.

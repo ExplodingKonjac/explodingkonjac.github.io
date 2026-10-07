@@ -1,12 +1,14 @@
 ---
 import Base from '../../layouts/Base.astro';
+import GlassSurface from '../../components/GlassSurface.astro';
 import { publishedPosts, tagUrl } from '../../lib/posts';
 const posts = await publishedPosts();
 const tags = [...new Set(posts.flatMap((post) => post.data.tags))].sort();
 ---
 
 <Base title="Tags" description="Browse the notebook by topic.">
-  <div class="page-heading">
+  <div class="page-heading glass">
+    <GlassSurface />
     <p class="eyebrow">BY TOPIC</p>
     <h1>
       Threads to follow<span>.</span>
@@ -16,9 +18,10 @@ const tags = [...new Set(posts.flatMap((post) => post.data.tags))].sort();
   <ul class="tag-index">
     {tags.map((tag) => (
       <li>
-        <a href={tagUrl(tag)}>
-          {tag}
-          <span>
+        <a class="glass" href={tagUrl(tag)}>
+          <GlassSurface />
+          <span>{tag}</span>
+          <span class="tag-count">
             {posts.filter((post) => post.data.tags.includes(tag)).length}
           </span>
         </a>

@@ -1,6 +1,7 @@
 ---
 import Base from '../../layouts/Base.astro';
 import PostList from '../../components/PostList.astro';
+import GlassSurface from '../../components/GlassSurface.astro';
 import { publishedPosts } from '../../lib/posts';
 export async function getStaticPaths() {
   const posts = await publishedPosts();
@@ -13,7 +14,8 @@ const { tag, posts } = Astro.props;
 ---
 
 <Base title={`Tag: ${tag}`} description={`Notes about ${tag}.`}>
-  <div class="page-heading">
+  <div class="page-heading glass">
+    <GlassSurface />
     <p class="eyebrow">BY TOPIC</p>
     <h1>
       {tag}

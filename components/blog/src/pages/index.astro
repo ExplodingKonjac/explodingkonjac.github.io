@@ -1,6 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import PostList from '../components/PostList.astro';
+import GlassSurface from '../components/GlassSurface.astro';
 import { publishedPosts } from '../lib/posts';
 const posts = await publishedPosts();
 ---
@@ -9,7 +10,8 @@ const posts = await publishedPosts();
   title="Blog"
   description="Notes on mathematics, algorithms, and technology."
 >
-  <div class="page-heading">
+  <div class="page-heading glass">
+    <GlassSurface />
     <p class="eyebrow">THE NOTEBOOK</p>
     <h1>
       Thinking in writing<span>.</span>

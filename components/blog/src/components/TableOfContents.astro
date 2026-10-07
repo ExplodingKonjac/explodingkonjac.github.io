@@ -1,0 +1,35 @@
+---
+import GlassSurface from './GlassSurface.astro';
+interface Props {
+  headings: { depth: number; slug: string; text: string }[];
+}
+const { headings } = Astro.props;
+---
+
+<aside class="toc glass glass-clear">
+  <GlassSurface />
+  <nav class="toc-desktop" aria-label="On this page">
+    <h2>On this page</h2>
+    <ol>
+      {headings.map((heading) => (
+        <li class:list={{ 'toc-nested': heading.depth === 3 }}>
+          <a href={`#${heading.slug}`}>{heading.text}</a>
+        </li>
+      ))}
+    </ol>
+  </nav>
+  <details class="toc-mobile">
+    <summary>
+      On this page <span aria-hidden="true">+</span>
+    </summary>
+    <nav aria-label="On this page">
+      <ol>
+        {headings.map((heading) => (
+          <li class:list={{ 'toc-nested': heading.depth === 3 }}>
+            <a href={`#${heading.slug}`}>{heading.text}</a>
+          </li>
+        ))}
+      </ol>
+    </nav>
+  </details>
+</aside>

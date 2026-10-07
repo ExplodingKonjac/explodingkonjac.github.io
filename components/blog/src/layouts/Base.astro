@@ -1,5 +1,9 @@
 ---
 import { componentUrl, site, absoluteUrl } from '@site/config';
+import { ClientRouter } from 'astro:transitions';
+import Background from '../components/Background.astro';
+import GlassSurface from '../components/GlassSurface.astro';
+import { themeStorageKey } from '../config/appearance';
 import '../styles/global.css';
 import 'katex/dist/katex.min.css';
 
@@ -21,15 +25,34 @@ const {
 } = Astro.props;
 const pageTitle = `${title} · ${site.name}`;
 const canonical = absoluteUrl(Astro.url.pathname);
+const tagsActive = Astro.url.pathname.startsWith(componentUrl('blog', 'tags'));
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="en" transition:animate="none">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
-    <meta name="theme-color" content="#f6f5f0" />
+    <meta name="theme-color" content="#e3eaf5" />
+    <script is:inline define:vars={{ themeStorageKey }}>
+      (() => {
+        let preference;
+        try {
+          preference = localStorage.getItem(themeStorageKey);
+        } catch {}
+        const theme =
+          preference === 'light' || preference === 'dark'
+            ? preference
+            : matchMedia('(prefers-color-scheme: dark)').matches
+              ? 'dark'
+              : 'light';
+        document.documentElement.dataset.theme = theme;
+        document.querySelector('meta[name="theme-color"]').content =
+          theme === 'dark' ? '#141d30' : '#e3eaf5';
+      })();
+    </script>
+    <ClientRouter fallback="animate" />
     <meta property="og:title" content={pageTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
@@ -55,27 +78,85 @@ const canonical = absoluteUrl(Astro.url.pathname);
     <title>{pageTitle}</title>
   </head>
   <body>
+    <Background />
     <a href="#main" class="skip-link">
       Skip to content
     </a>
     <div class="shell">
-      <header class="site-header">
+      <header
+        class="site-header glass glass-clear"
+        transition:name="blog-header"
+        transition:persist="blog-header"
+        transition:animate="none"
+      >
+        <GlassSurface />
         <a href={componentUrl('blog')} class="wordmark">
           {site.name}
           <span aria-hidden="true">.</span>
         </a>
-        <nav aria-label="Main navigation">
-          <a href={componentUrl('blog')}>Blog</a>
-          <a href={componentUrl('blog', 'tags')}>Tags</a>
-          <a href={componentUrl('blog', 'rss.xml')}>RSS</a>
-        </nav>
+        <div class="header-controls">
+          <nav aria-label="Main navigation">
+            <a
+              href={componentUrl('blog')}
+              data-nav="blog"
+              aria-current={!tagsActive ? 'page' : undefined}
+            >
+              Blog
+            </a>
+            <a
+              href={componentUrl('blog', 'tags')}
+              data-nav="tags"
+              aria-current={tagsActive ? 'page' : undefined}
+            >
+              Tags
+            </a>
+            <a href={componentUrl('blog', 'rss.xml')} data-astro-reload>
+              RSS
+            </a>
+          </nav>
+          <button
+            class="theme-toggle"
+            type="button"
+            aria-label="Switch to dark mode"
+            hidden
+          >
+            <svg
+              class="icon-sun"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.6"
+              aria-hidden="true"
+            >
+              <circle cx="12" cy="12" r="4" />
+              <path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42" />
+            </svg>
+            <svg
+              class="icon-moon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.6"
+              aria-hidden="true"
+            >
+              <path d="M20.5 13.5A8.8 8.8 0 0 1 10.5 3.5 8.8 8.8 0 1 0 20.5 13.5Z" />
+            </svg>
+          </button>
+        </div>
       </header>
-      <main id="main">
-        <slot />
-      </main>
-      <footer class="site-footer">
-        <span>Notes by {site.name}.</span>
-      </footer>
+      <div class="page-stage">
+        <main id="main" data-page={article ? 'post' : 'listing'} tabindex="-1">
+          <slot />
+        </main>
+        <footer class="site-footer glass">
+          <GlassSurface />
+          <span>Notes by {site.name}.</span>
+        </footer>
+      </div>
     </div>
+    <script>
+      import '../scripts/appearance';
+      import '../scripts/navigation';
+    </script>
   </body>
 </html>

@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1440" viewBox="0 0 1920 1440" fill="none">
+  <defs>
+    <linearGradient id="base" x1="120" y1="80" x2="1760" y2="1400" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#dce7f5"/><stop offset=".48" stop-color="#b9c8e9"/><stop offset="1" stop-color="#dad4ed"/>
+    </linearGradient>
+    <linearGradient id="ribbon" x1="620" y1="120" x2="1260" y2="1220" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#f6f9ff"/><stop offset=".44" stop-color="#b8d5ed"/><stop offset=".72" stop-color="#899acb"/><stop offset="1" stop-color="#e9ddf5"/>
+    </linearGradient>
+    <radialGradient id="light" cx="0" cy="0" r="1" gradientTransform="translate(400 240) rotate(39) scale(1070 660)" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#fff" stop-opacity=".88"/><stop offset="1" stop-color="#fff" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="soft"><feGaussianBlur stdDeviation="55"/></filter>
+  </defs>
+  <path fill="url(#base)" d="M0 0h1920v1440H0z"/>
+  <g filter="url(#soft)">
+    <path d="M-230 1200C220 1290 930 610 1020 190S1670-260 2180 110" stroke="#9faddb" stroke-opacity=".6" stroke-width="380"/>
+    <path d="M-300 1070C220 1230 1030 600 1110 170S1680-210 2170 10" stroke="url(#ribbon)" stroke-width="310"/>
+    <path d="M1290 1680C1070 1160 1430 770 2030 700" stroke="#eee6f8" stroke-opacity=".75" stroke-width="230"/>
+  </g>
+  <path fill="url(#light)" d="M0 0h1920v1440H0z"/>
+</svg>

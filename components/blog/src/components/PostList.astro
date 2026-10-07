@@ -1,6 +1,7 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 import { postUrl, tagUrl, formatDate } from '../lib/posts';
+import GlassSurface from './GlassSurface.astro';
 interface Props {
   posts: CollectionEntry<'posts'>[];
 }
@@ -9,7 +10,12 @@ const { posts } = Astro.props;
 
 <ol class="post-list">
   {posts.map((post) => (
-    <li>
+    <li
+      class="post-card glass"
+      data-post-key={post.id}
+      data-post-url={postUrl(post)}
+    >
+      <GlassSurface />
       <div class="post-date">
         <time datetime={post.data.pubDate.toISOString()}>
           {formatDate(post.data.pubDate)}
@@ -17,7 +23,12 @@ const { posts } = Astro.props;
         {post.data.draft && <span class="draft-badge">Draft</span>}
       </div>
       <h2>
-        <a href={postUrl(post)}>{post.data.title}</a>
+        <a class="post-link" href={postUrl(post)}>
+          {post.data.title}
+          <span class="post-arrow" aria-hidden="true">
+            ↗
+          </span>
+        </a>
       </h2>
       <p>{post.data.description}</p>
       <ul class="tags" aria-label="Post tags">
@@ -30,4 +41,9 @@ const { posts } = Astro.props;
     </li>
   ))}
 </ol>
-{posts.length === 0 && <p>No published notes yet.</p>}
+{posts.length === 0 && (
+  <div class="empty-state glass">
+    <GlassSurface />
+    <p>No published notes yet.</p>
+  </div>
+)}

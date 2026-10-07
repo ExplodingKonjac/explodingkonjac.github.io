@@ -1,0 +1,137 @@
+@keyframes content-out {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes content-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes text-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes reading-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+::view-transition-group(blog-background),
+::view-transition-group(blog-header) {
+  animation: none;
+}
+::view-transition-group(blog-background) {
+  z-index: 0;
+}
+::view-transition-group(page-in),
+::view-transition-group(page-out),
+::view-transition-group(article-body-in),
+::view-transition-group(article-body-out),
+::view-transition-group(article-toc-in),
+::view-transition-group(article-toc-out) {
+  z-index: 2;
+  animation: none;
+}
+::view-transition-group(post-surface) {
+  z-index: 1;
+}
+::view-transition-group(blog-header) {
+  z-index: 3;
+}
+::view-transition-old(blog-background),
+::view-transition-old(blog-header) {
+  animation: none;
+  opacity: 0;
+}
+::view-transition-new(blog-background),
+::view-transition-new(blog-header) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+::view-transition-old(page-out),
+::view-transition-old(article-body-out),
+::view-transition-old(article-toc-out) {
+  animation: content-out 100ms ease both;
+}
+::view-transition-new(page-in),
+::view-transition-new(article-body-in),
+::view-transition-new(article-toc-in) {
+  animation: content-in 180ms var(--ease) 60ms both;
+}
+::view-transition-image-pair(post-surface) {
+  isolation: auto;
+}
+::view-transition-old(post-surface),
+::view-transition-new(post-surface) {
+  height: 100%;
+  width: 100%;
+  mix-blend-mode: normal;
+}
+::view-transition-old(post-surface) {
+  animation: content-out 320ms ease 100ms both;
+}
+::view-transition-new(post-surface) {
+  animation: text-in 320ms ease 100ms both;
+}
+[data-motion='open']::view-transition-group(post-surface),
+[data-motion='close']::view-transition-group(post-surface) {
+  animation-duration: 320ms;
+  animation-delay: 100ms;
+  animation-timing-function: var(--ease);
+  animation-fill-mode: both;
+}
+[data-motion='open']::view-transition-new(page-in) {
+  animation: text-in 200ms ease 220ms both;
+}
+[data-motion='open']::view-transition-new(article-body-in) {
+  animation: reading-in 200ms var(--ease) 340ms both;
+}
+[data-motion='open']::view-transition-new(article-toc-in) {
+  animation: reading-in 160ms var(--ease) 400ms both;
+}
+[data-motion='close']::view-transition-new(page-in) {
+  animation: text-in 200ms ease 300ms both;
+}
+[data-astro-transition-fallback='old'] .page-stage {
+  animation: content-out 100ms ease both;
+}
+[data-astro-transition-fallback='new'] .page-stage {
+  animation: content-in 160ms var(--ease) both;
+}
+html[data-motion] .post-card {
+  transform: none;
+  transition: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}
+
+/* History restoration must finish before capturing the incoming document. */
+html[data-motion] {
+  scroll-behavior: auto;
+}
+
+/* A destination that moved offscreen after restoration uses the short fade. */
+[data-motion='fade']::view-transition-old(post-surface) {
+  animation: content-out 100ms ease both;
+}
