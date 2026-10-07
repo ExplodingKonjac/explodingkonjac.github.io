@@ -1,5 +1,5 @@
 ---
-import { components, componentUrl, site, absoluteUrl } from '@site/config';
+import { componentUrl, site, absoluteUrl } from '@site/config';
 import '../styles/global.css';
 import 'katex/dist/katex.min.css';
 
@@ -60,7 +60,7 @@ const canonical = absoluteUrl(Astro.url.pathname);
     </a>
     <div class="shell">
       <header class="site-header">
-        <a href={componentUrl('home')} class="wordmark">
+        <a href={componentUrl('blog')} class="wordmark">
           {site.name}
           <span aria-hidden="true">.</span>
         </a>
@@ -75,16 +75,6 @@ const canonical = absoluteUrl(Astro.url.pathname);
       </main>
       <footer class="site-footer">
         <span>Notes by {site.name}.</span>
-        <nav aria-label="Other places">
-          {components
-            .filter((entry) => entry.id !== 'blog')
-            .map((entry) => (
-              <a href={componentUrl(entry.id)}>
-                {entry.id === 'home' ? 'Home' : entry.title}
-              </a>
-            ))}
-          <a href={site.github}>GitHub ↗</a>
-        </nav>
       </footer>
     </div>
   </body>

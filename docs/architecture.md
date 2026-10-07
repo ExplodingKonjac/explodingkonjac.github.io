@@ -14,7 +14,7 @@ The registry in `packages/site-config/index.mjs` defines the origin, identity, d
 
 Components build to local `dist/`. The assembler validates every output before clearing `_site/`, then copies the homepage to the root and other components beneath their mounts. It rejects duplicate or overlapping mounts, missing indexes, reserved-path conflicts, generated-file collisions and symlinks. It writes the root 404 page, robots file and `.nojekyll` marker.
 
-Astro's blog sitemap includes registered homepage and app URLs through `customPages`. The root robots file points to its sitemap index.
+The blog's navigation and sitemap stay within `/blog/`. Its wordmark links to the blog index, and its footer contains attribution without links to other components or profiles. The root robots file points to the blog's sitemap index.
 
 Astro uses `site` for the origin, `base` for `/blog/`, static output, directory-format pages and trailing slashes. Assets stay within each component's subtree. Authored images are colocated and processed by Astro. GitHub Pages has no general SPA rewrite service; future apps use static pages or hash routing.
 

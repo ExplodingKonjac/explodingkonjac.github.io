@@ -4,7 +4,7 @@ import sitemap from '@astrojs/sitemap';
 import remarkDirective from 'remark-directive';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
-import { components, component, site, absoluteUrl } from '@site/config';
+import { component, site } from '@site/config';
 import environments from './src/plugins/environments.mjs';
 import headingLinks from './src/plugins/heading-links.mjs';
 import { mathMacros } from './src/plugins/math-macros.mjs';
@@ -16,13 +16,7 @@ export default defineConfig({
   trailingSlash: 'always',
   build: { format: 'directory' },
   vite: { server: { strictPort: true, hmr: false, ws: false, watch: null } },
-  integrations: [
-    sitemap({
-      customPages: components
-        .filter((entry) => entry.id !== 'blog')
-        .map((entry) => absoluteUrl(entry.mount)),
-    }),
-  ],
+  integrations: [sitemap()],
   markdown: {
     processor: unified({
       remarkPlugins: [remarkDirective, remarkMath, environments],
