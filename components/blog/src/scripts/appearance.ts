@@ -23,7 +23,9 @@ function applyTheme(doc: Document = document) {
     button.hidden = false;
     button.setAttribute(
       'aria-label',
-      `Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`,
+      window.__blogLocale?.text(
+        theme === 'dark' ? 'theme.light' : 'theme.dark',
+      ) ?? `Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`,
     );
     button.title = button.getAttribute('aria-label')!;
   }
@@ -147,10 +149,13 @@ function initializePage() {
   requestAnimationFrame(() => {
     document.documentElement.dataset.themeReady = '';
   });
-  const tagsActive = location.pathname.startsWith(blogUrl('tags'));
+  const section = location.pathname.startsWith(blogUrl('tags'))
+    ? 'tags'
+    : location.pathname.startsWith(blogUrl('search'))
+      ? 'search'
+      : 'blog';
   document.querySelectorAll<HTMLElement>('[data-nav]').forEach((link) => {
-    if ((link.dataset.nav === 'tags') === tagsActive)
-      link.setAttribute('aria-current', 'page');
+    if (link.dataset.nav === section) link.setAttribute('aria-current', 'page');
     else link.removeAttribute('aria-current');
   });
   pageController?.abort();

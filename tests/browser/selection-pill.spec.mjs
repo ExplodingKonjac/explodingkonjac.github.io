@@ -29,7 +29,7 @@ for (const width of [390, 1440]) {
     const pill = nav.locator('.selection-pill');
     const blog = nav.getByRole('link', { name: 'Blog', exact: true });
     const tags = nav.getByRole('link', { name: 'Tags', exact: true });
-    const rss = nav.getByRole('link', { name: 'RSS', exact: true });
+    const search = nav.getByRole('link', { name: 'Search', exact: true });
     await expect(pill).toHaveCount(1);
     await aligned(pill, blog);
     await page.clock.pauseAt(new Date('2026-10-08T10:01:00Z'));
@@ -51,7 +51,7 @@ for (const width of [390, 1440]) {
     expect(linkMaterials).toEqual(
       Array(3).fill(['rgba(0, 0, 0, 0)', 'none', 'none']),
     );
-    await rss.hover();
+    await search.hover();
     expect(Math.abs((await pill.boundingBox()).x - middle.x)).toBeLessThan(1);
     await page.clock.runFor(80);
     const further = await pill.boundingBox();

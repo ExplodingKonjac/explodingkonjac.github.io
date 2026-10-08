@@ -16,6 +16,14 @@ function paint(value: number) {
     .querySelector<HTMLElement>('.shell')!
     .getBoundingClientRect();
   const mobile = innerWidth <= 600;
+  const style = getComputedStyle(header);
+  const floatingHeight = parseFloat(
+    style.getPropertyValue('--nav-floating-height'),
+  );
+  const dockedHeight = parseFloat(
+    style.getPropertyValue('--nav-docked-height'),
+  );
+  const height = floatingHeight + (dockedHeight - floatingHeight) * value;
   const top =
     parseFloat(getComputedStyle(document.querySelector('.header-slot')!).top) ||
     (mobile ? 12 : 20);
@@ -25,25 +33,14 @@ function paint(value: number) {
   header.style.left = `${bounds.left * (1 - value)}px`;
   header.style.width = `${bounds.width + (width - bounds.width) * value}px`;
   header.style.top = `${top * (1 - value)}px`;
-  header.style.height = `${mobile ? 108 - 4 * value : 76 - 12 * value}px`;
+  header.style.height = `${height}px`;
   header.style.borderRadius = `${(mobile ? 22 : 28) * (1 - value)}px`;
   header.style.setProperty('--nav-progress', String(value));
-  header.style.setProperty(
-    '--nav-button-progress',
-    String(smooth(Math.min(1, value / 0.5))),
-  );
-  header.style.setProperty(
-    '--nav-links-progress',
-    String(smooth(Math.max(0, (value - 0.5) / 0.5))),
-  );
   document.documentElement.style.setProperty(
     '--anchor-offset',
-    `${top * (1 - value) + (mobile ? 108 : 76) - (mobile ? 4 : 12) * value + 20}px`,
+    `${top * (1 - value) + height + 20}px`,
   );
-  document.documentElement.style.setProperty(
-    '--header-height',
-    `${mobile ? 108 - 4 * value : 76 - 12 * value}px`,
-  );
+  document.documentElement.style.setProperty('--header-height', `${height}px`);
   refreshGlass(surface);
 }
 function schedule() {
@@ -55,6 +52,7 @@ function schedule() {
 }
 window.addEventListener('scroll', schedule, { passive: true });
 window.addEventListener('resize', schedule, { passive: true });
+document.addEventListener('blog:language-change', schedule);
 window.addEventListener(
   'wheel',
   () => {

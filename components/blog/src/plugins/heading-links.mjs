@@ -11,6 +11,7 @@ export default function headingLinks() {
           href: `#${node.properties.id}`,
           className: ['heading-anchor'],
           ariaLabel: 'Link to this heading',
+          'data-i18n-aria': 'heading.link',
         },
         children: [{ type: 'text', value: '#' }],
       });

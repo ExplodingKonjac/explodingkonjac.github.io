@@ -18,7 +18,9 @@ The build-only registry in `scripts/components.mjs` lists package names, source 
 
 Components build to local `dist/`. The assembler validates every output before clearing `_site/`, then copies the homepage to the root and other components beneath their mounts. It rejects duplicate or overlapping mounts, missing indexes, reserved-path conflicts, generated-file collisions and symlinks. It writes the root 404 page, robots file and `.nojekyll` marker.
 
-The blog's navigation and sitemap stay within `/blog/`. Its wordmark links to the blog index, and its footer contains attribution without links to other components or profiles. The root robots file points to the blog's sitemap index.
+The blog's generated pages and sitemap stay within `/blog/`. Its wordmark links to the blog index; the main navigation groups Blog, Tags, and Search. A separate GitHub icon opens the configured profile in a new tab. RSS remains available at `/blog/rss.xml` and through feed autodiscovery. The root robots file points to the blog's sitemap index.
+
+Search builds a local JSON index from published posts' titles, summaries, and rendered body text. The browser ranks matches and filters existing post cards, keeping queries in the URL for history and refresh. The index excludes drafts and uses no external search service. Interface translations live in `src/config/i18n.ts`; an inline TypeScript initializer applies the browser language or saved choice before display and before Astro swaps. Posts and tag names keep their authored text, without duplicate language routes.
 
 Astro uses `site` for the origin, `base` for `/blog/`, static output, directory-format pages and trailing slashes. Astro's ClientRouter enhances blog navigation with live glass-surface transitions while retaining every generated static page. The wallpaper and navigation bar persist between blog routes; RSS uses ordinary document navigation. See [Blog appearance](blog-appearance.md) for theme, wallpaper, and motion configuration.
 

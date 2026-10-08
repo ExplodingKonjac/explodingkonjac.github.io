@@ -2,6 +2,7 @@ export const site = Object.freeze({
   origin: 'https://explodingkonjac.github.io',
   base: '/blog/',
   name: "ExplodingKonjac's Blog",
+  github: 'https://github.com/ExplodingKonjac',
   description:
     'Notes on mathematics, algorithms, and technology. A place for things I build.',
 });

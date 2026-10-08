@@ -466,7 +466,7 @@ test('history restores a scrolled list and offscreen cards do not morph', async 
   });
   await page.goBack();
   await settled(page);
-  expect(await page.evaluate(() => window.returnMode)).toBe('fade');
+  expect(await page.evaluate(() => window.returnMode)).toBe('reveal');
   expect(Math.abs((await page.evaluate(() => scrollY)) - scroll)).toBeLessThan(
     3,
   );
@@ -583,10 +583,14 @@ test('increased contrast provides opaque glass and forced colors preserve contro
   await expect(page.locator('.theme-toggle')).toBeVisible();
 });
 
-test('returning through Blog visibly fades the live article before swapping', async ({
+test('returning through Blog collapses the live article before swapping', async ({
   page,
 }) => {
   await page.goto(post);
+  const original = await page.locator('.reading-card').boundingBox();
+  const scrollHeight = await page.evaluate(
+    () => document.documentElement.scrollHeight,
+  );
   await page.evaluate(() => {
     const animate = Element.prototype.animate;
     window.exitAnimations = [];
@@ -598,7 +602,7 @@ test('returning through Blog visibly fades the live article before swapping', as
       if (
         this.closest('.page-stage') &&
         Array.isArray(frames) &&
-        frames.at(-1).opacity === 0
+        frames.at(-1).visibility === 'hidden'
       ) {
         result.pause();
         result.currentTime = options.duration / 2;
@@ -612,11 +616,23 @@ test('returning through Blog visibly fades the live article before swapping', as
     .poll(() => page.evaluate(() => window.exitAnimations.length))
     .toBeGreaterThan(0);
   await expect(page).toHaveURL(post);
-  const opacity = await page
+  const material = await page
     .locator('.reading-card > .glass-surface')
-    .evaluate((node) => Number(getComputedStyle(node).opacity));
-  expect(opacity).toBeGreaterThan(0);
-  expect(opacity).toBeLessThan(1);
+    .evaluate((node) => ({
+      height: node.getBoundingClientRect().height,
+      opacity: getComputedStyle(node).opacity,
+    }));
+  expect(material.height).toBeGreaterThan(0);
+  expect(material.height).toBeLessThan(original.height);
+  expect(material.opacity).toBe('1');
+  expect(await page.locator('.reading-card').boundingBox()).toEqual(original);
+  expect(await page.evaluate(() => document.documentElement.scrollHeight)).toBe(
+    scrollHeight,
+  );
+  await expect(page.locator('.reading-card > .prose')).not.toHaveCSS(
+    'clip-path',
+    'none',
+  );
   expect(
     await page
       .locator('.reading-card')
@@ -645,7 +661,7 @@ test('mounted glass has its final material throughout its entrance', async ({
       if (
         this.closest('.page-stage') &&
         Array.isArray(frames) &&
-        frames[0].opacity === 0
+        frames[0].visibility === 'hidden'
       ) {
         result.pause();
         result.currentTime = options.delay + options.duration / 2;
@@ -1141,6 +1157,81 @@ async function finishHeldMotion(page) {
 }
 
 for (const width of [390, 1440]) {
+  test(`cards unfold and stream content without shifting layout at ${width}px`, async ({
+    page,
+  }, testInfo) => {
+    await page.setViewportSize({ width, height: 1000 });
+    await page.goto('/blog/tags/');
+    await holdIncomingMotion(page);
+    await page.locator('[data-nav="blog"]').click();
+    await expect(page).toHaveURL('/blog/');
+    const card = page.locator('.page-heading');
+    const surface = card.locator('.glass-surface');
+    const title = card.locator('h1');
+    await expect(card).toHaveAttribute('inert', '');
+    const full = await card.boundingBox();
+    const text = await title.textContent();
+    const font = await title.evaluate(
+      (node) => getComputedStyle(node).fontSize,
+    );
+    const scrollHeight = await page.evaluate(
+      () => document.documentElement.scrollHeight,
+    );
+    await expect(surface).toHaveCSS('visibility', 'hidden');
+    await expect(title).toHaveCSS('visibility', 'hidden');
+    let previous = 0;
+    for (const time of [30, 70, 140, 260, 360]) {
+      await page.evaluate(
+        (time) =>
+          window.heldMotion.forEach(
+            (animation) => (animation.currentTime = time),
+          ),
+        time,
+      );
+      const material = await surface.boundingBox();
+      expect(material.height).toBeGreaterThan(previous);
+      previous = material.height;
+      expect(material.width).toBeCloseTo(full.width, 1);
+      expect(await card.boundingBox()).toEqual(full);
+      expect(
+        await page.evaluate(() => document.documentElement.scrollHeight),
+      ).toBe(scrollHeight);
+      await expect(surface).toHaveCSS('opacity', '1');
+      await expect(card).toHaveCSS('clip-path', 'none');
+      await expect(card).toHaveCSS('opacity', '1');
+      await expect(title).toHaveCSS('font-size', font);
+      await expect(title).toHaveCSS('transform', 'none');
+      expect(await title.textContent()).toBe(text);
+      const edge = await title.evaluate((node) => {
+        const box = node.getBoundingClientRect();
+        const bottomInset = Number(
+          getComputedStyle(node).clipPath.match(/-?[\d.]+/g)[2],
+        );
+        return box.bottom - bottomInset;
+      });
+      const padding = await card.evaluate((node) =>
+        parseFloat(getComputedStyle(node).paddingBottom),
+      );
+      expect(
+        Math.abs(edge - (material.y + material.height - padding)),
+      ).toBeLessThan(0.2);
+      if (time === 70)
+        await page.screenshot({
+          path: testInfo.outputPath(`card-unfold-${width}.png`),
+        });
+    }
+    await finishHeldMotion(page);
+    await expect(card).not.toHaveAttribute('inert');
+    await expect(title).toHaveCSS('clip-path', 'none');
+    await expect(surface).toHaveCSS('visibility', 'visible');
+    expect((await surface.boundingBox()).height).toBeCloseTo(full.height, 1);
+    await expect(
+      page.locator('.page-stage [inert], [data-nav-layer]'),
+    ).toHaveCount(0);
+  });
+}
+
+for (const width of [390, 1440]) {
   test(`tag tile and live label morph into their category header at ${width}px`, async ({
     page,
   }, testInfo) => {
@@ -1204,8 +1295,8 @@ for (const width of [390, 1440]) {
     expect(
       await page
         .locator('.post-card > .glass-surface')
-        .evaluate((node) => getComputedStyle(node).opacity),
-    ).toBe('0');
+        .evaluate((node) => getComputedStyle(node).visibility),
+    ).toBe('hidden');
     await page.screenshot({
       path: testInfo.outputPath(`tag-morph-mid-${width}.png`),
     });
@@ -1377,13 +1468,13 @@ test('post card carries its title, description and tags into the article header 
   expect(
     await page
       .locator('.reading-card > .glass-surface')
-      .evaluate((n) => getComputedStyle(n).opacity),
-  ).toBe('0');
+      .evaluate((n) => getComputedStyle(n).visibility),
+  ).toBe('hidden');
   expect(
     await page
       .locator('.article-heading .post-date')
-      .evaluate((n) => getComputedStyle(n).opacity),
-  ).toBe('0');
+      .evaluate((n) => getComputedStyle(n).visibility),
+  ).toBe('hidden');
   await page.screenshot({
     path: testInfo.outputPath('post-content-morph-mid.png'),
   });

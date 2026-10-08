@@ -58,6 +58,29 @@ the fallback. Keep the bundled `backgrounds/aurora.svg` available as the fallbac
 
 ## Themes and materials
 
+The navbar's shared pill selects Blog, Tags, or Search. Separate round GitHub,
+theme, and language buttons sit beside it. Set `github` in `src/config/site.mjs`
+to change the new-tab profile link. The RSS feed and its autodiscovery link remain
+available, though RSS is no longer a navbar item.
+
+Interface translations live in `src/config/i18n.ts`. Chinese browser locales use
+Simplified Chinese; English and unsupported locales use English. An explicit
+choice is saved in `blog-ui-language`; removing it restores browser-language
+following. Blocked storage retains the choice for the current document session.
+Labels, accessibility text, dates, search messages, and fixed page metadata switch
+together. Authored titles, summaries, bodies, headings, and tag names are unchanged.
+The inline initializer in `src/scripts/locale.ts` runs before visible translated
+text and on incoming documents. Without JavaScript, the interface remains English.
+
+Search matches words across titles, summaries, and rendered body text, including
+Chinese substrings. It ignores case, accent marks, and full-width character
+differences, requires every query term to match, and prioritizes titles, then
+summaries, then contents. Body matches show an excerpt. Search fetches its static
+index once per document session; queries stay in `?q=` for history and bookmarking.
+No external search service is used.
+Production and preview indexes omit drafts. Without JavaScript, Search shows the
+published post list for browsing.
+
 The theme follows the operating system until the visitor uses the sun/moon button.
 The explicit choice is stored in `blog-appearance-theme` in local storage. Removing
 that key restores system following. If storage is unavailable, the choice survives
@@ -143,18 +166,26 @@ Native bitmap view transitions are skipped: flattened snapshots and fading an
 ancestor of a backdrop filter can change the sampled background and cause a material
 pop. Instead, each live glass surface and each text layer animate independently.
 
-After the next document is ready, outgoing layers visibly fade over 220ms before
-HTML is swapped. Incoming surfaces fade in place, while their text settles by 6px.
+After the next document is ready, outgoing glass collapses vertically over 260ms
+before HTML is swapped. Content retracts from bottom to top with the closing edge.
+Incoming glass grows from zero height over 360ms, streaming its contents into view
+from top to bottom, with a small stagger between cards. Text keeps its natural size
+and line breaks; it is neither scaled nor rewritten character by character.
+Card layout space stays reserved so neighbors and scroll positions remain stable.
+For articles taller than the viewport, the visible portion unfolds first and the
+offscreen remainder is released at handoff. Neither opacity nor clipping is applied
+to a glass ancestor, so the backdrop stays live throughout the motion.
 For a visible matching post, a live glass surface travels to the destination's
 geometry over 420ms, carrying its title, description, and tag pills. Single-line
-text changes typography directly; wrapped text blends between two fixed layouts
+titles change typography directly; descriptions and wrapped titles blend between two fixed layouts
 along the same path, so line breaks do not jump while the card grows. The date
-crossfades between its different positions instead of crossing the title. The
+retracts and reveals at its different positions instead of crossing the title. The
 eyebrow, article body and ToC follow in sequence. This works
 for Blog/wordmark links as well as browser history. Missing or clipped endpoints
-use the short fade. Rapid navigation cancels and cleans up the previous sequence.
+use the vertical reveal. Rapid navigation cancels and cleans up the previous sequence.
 No card ancestor animates opacity, and the material uses its final tint from its
-first visible frame. Reduced motion removes animation and delay.
+first visible frame. Reduced motion removes animation and delay. Cards are inert
+during their reveal, and regain their normal interaction state at completion.
 
 The native post link covers the overview card's empty space as well as its title.
 Tag links retain separate hit areas, and modified clicks use normal browser
@@ -162,9 +193,9 @@ navigation. Moving content copies are inert and hidden from assistive technology
 keyboard focus moves to the real heading after the animation handoff.
 
 On Tags, a tile and its category header share a stable `data-tag-key`. Once the
-surrounding cards have faded, the selected glass moves upward and expands over
+surrounding cards have collapsed, the selected glass moves upward and expands over
 420ms. Its label moves with it and changes font size, spacing, and line height
-directly, keeping the text sharp. The count fades out; the header eyebrow and
+directly, keeping the text sharp. The count retracts; the header eyebrow and
 post list enter as the panel settles. Returning to Tags reverses the transition
 and browser history restores focus to the originating tile. Labels that wrap
 crossfade at their final typography to avoid line-break jumps. Keyboard focus
@@ -178,8 +209,8 @@ left, and right rim highlights and refraction fade with the docking progress.
 When fully docked, only the bottom edge refracts and starts the blur gradient;
 the top and sides remain fully frosted. Scrolling back restores the full floating
 outline and its surrounding gradient. Desktop
-contents spread toward the outer margins. On mobile, the theme button moves to
-the upper row before the navigation links expand into the space it leaves. The
+contents spread toward the outer margins. Compact layouts use two rows, with a
+third utility row below 390px so controls remain separate and at least 44px wide. The
 flow slot retains its height so reshaping cannot move the document underneath it.
 Route-driven scroll restoration eases the persistent bar to its new geometry;
 anchor offsets follow its actual dimensions.

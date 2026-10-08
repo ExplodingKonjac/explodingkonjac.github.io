@@ -9,14 +9,21 @@ const posts = await publishedPosts();
 <Base
   title="Blog"
   description="Notes on mathematics, algorithms, and technology."
+  titleKey="title.blog"
+  descriptionKey="meta.blog"
 >
   <div class="page-heading glass">
     <GlassSurface />
-    <p class="eyebrow">THE NOTEBOOK</p>
+    <p class="eyebrow" data-i18n="home.eyebrow">
+      THE NOTEBOOK
+    </p>
     <h1>
-      Thinking in writing<span>.</span>
+      <span data-i18n="home.title">Thinking in writing</span>
+      <span>.</span>
     </h1>
-    <p>Mathematics, algorithms, and technology. Ideas worth working through.</p>
+    <p data-i18n="home.description">
+      Mathematics, algorithms, and technology. Ideas worth working through.
+    </p>
   </div>
   <PostList posts={posts} />
 </Base>

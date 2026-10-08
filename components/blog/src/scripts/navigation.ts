@@ -4,8 +4,8 @@ import type {
 } from 'astro:transitions/client';
 import { prepareGlass } from './glass';
 
-// Animate live material independently of text. Fading a parent of backdrop-filter
-// creates a new backdrop root; page snapshots also lose the live refracted scene.
+// Grow live material independently of content clipping. Clipping/fading a parent
+// of backdrop-filter changes its backdrop root and loses the refracted scene.
 const reduced = matchMedia('(prefers-reduced-motion: reduce)');
 const easing = 'cubic-bezier(0.22, 1, 0.36, 1)';
 let keyboard = false;
@@ -18,12 +18,13 @@ type ContentFlight = {
 };
 type Navigation = {
   id: number;
-  mode: 'open' | 'close' | 'fade';
+  mode: 'open' | 'close' | 'reveal';
   item?: Item;
   keyboard: boolean;
   traversal: boolean;
   hash: string;
   animations: Animation[];
+  cards: Map<HTMLElement, boolean>;
   flight?: HTMLElement;
   source?: HTMLElement;
   sourceLabel?: HTMLElement;
@@ -50,6 +51,17 @@ document.addEventListener(
   },
   { capture: true, passive: true },
 );
+document.addEventListener('focusin', () => {
+  // An explicit focus change after route load takes precedence over the delayed
+  // heading handoff, including interaction with the persistent navigation bar.
+  if (pendingFocus?.pageLoaded) pendingFocus = undefined;
+});
+document.addEventListener('blog:language-change', () => {
+  // Translated labels and dates can resize a panel. Hand off the current motion
+  // before measuring the new language so the glass never lands at stale bounds.
+  active?.animations.forEach((animation) => animation.finish());
+  prepareGlass();
+});
 
 function cardFor(doc: Document, item: Item) {
   const attribute = `data-${item.kind}-key`;
@@ -84,10 +96,11 @@ async function animate(
   frames: Keyframe[],
   duration: number,
   delay = 0,
+  curve = frames.at(-1)?.opacity === 0 ? 'ease-in-out' : easing,
 ) {
   if (element.closest('.glass-flight')) {
-    // Keep fixed typography in the inline style. WebKit can skip position updates
-    // when the same effect redundantly animates an unchanged font size.
+    // Keep fixed typography inline. WebKit can skip position updates when the
+    // same effect redundantly animates an unchanged font size.
     const fixedType = [
       'fontSize',
       'fontWeight',
@@ -107,14 +120,109 @@ async function animate(
   const animation = element.animate(frames, {
     duration: reduced.matches ? 0 : duration,
     delay: reduced.matches ? 0 : delay,
-    easing: frames.at(-1)?.opacity === 0 ? 'ease-in-out' : easing,
+    easing: curve,
     fill: 'both',
   });
   state.animations.push(animation);
   await animation.finished.catch(() => {});
 }
+
+function revealText(
+  state: Navigation,
+  element: HTMLElement,
+  opening: boolean,
+  duration: number,
+  delay = 0,
+  start = 0,
+  end = element.getBoundingClientRect().height,
+) {
+  const height = element.getBoundingClientRect().height;
+  const frame = (edge: number, visibility: string): Keyframe => ({
+    // Negative bottom insets release shadows/descenders after the edge passes.
+    clipPath: `inset(0px -24px ${height - edge}px -24px)`,
+    visibility,
+  });
+  const closed = frame(start, 'hidden');
+  const open = frame(end, 'visible');
+  return animate(
+    state,
+    element,
+    opening ? [closed, open] : [open, closed],
+    duration,
+    delay,
+    opening ? easing : 'ease-in-out',
+  );
+}
+
+function revealCard(
+  state: Navigation,
+  card: HTMLElement,
+  opening: boolean,
+  delay = 0,
+) {
+  if (reduced.matches) return [];
+  if (!state.cards.has(card)) state.cards.set(card, card.inert);
+  card.inert = true;
+  const box = card.getBoundingClientRect();
+  const inset = parseFloat(getComputedStyle(card).paddingBottom) || 0;
+  const surface = card.querySelector<HTMLElement>(':scope > .glass-surface');
+  // Keep the layout's full height for scroll restoration and stable neighboring
+  // cards. Long articles unfold within the viewport; their offscreen remainder
+  // is restored on handoff without a scroll-height jump.
+  const onScreen = box.bottom > 0 && box.top < innerHeight;
+  const start = onScreen ? Math.max(0, -box.top - 32) : 0;
+  const end = onScreen
+    ? Math.min(box.height, innerHeight - box.top + inset + 32)
+    : box.height;
+  const duration = onScreen ? (opening ? 360 : 260) : 0;
+  const jobs: Promise<unknown>[] = [];
+  if (
+    surface &&
+    surface !== state.source &&
+    !surface.hasAttribute('data-flight-target')
+  ) {
+    const closed = { height: `${start}px`, visibility: 'hidden' };
+    const open = { height: `${end}px`, visibility: 'visible' };
+    jobs.push(
+      animate(
+        state,
+        surface,
+        opening ? [closed, open] : [open, closed],
+        duration,
+        onScreen ? delay : 0,
+        opening ? easing : 'ease-in-out',
+      ),
+    );
+  }
+  for (const child of card.children) {
+    if (
+      !(child instanceof HTMLElement) ||
+      child === surface ||
+      child === state.sourceLabel ||
+      child.hasAttribute('data-flight-target') ||
+      state.content.some(({ source }) => child === source)
+    )
+      continue;
+    const top = child.getBoundingClientRect().top - box.top;
+    jobs.push(
+      revealText(
+        state,
+        child,
+        opening,
+        duration,
+        onScreen ? delay : 0,
+        start - top - inset,
+        end - top - inset,
+      ),
+    );
+  }
+  return jobs;
+}
 function clean(state: Navigation) {
   state.animations.forEach((animation) => animation.cancel());
+  state.cards.forEach((inert, card) => {
+    card.inert = inert;
+  });
   state.flight?.remove();
   state.source?.style.removeProperty('visibility');
   state.sourceLabel?.style.removeProperty('visibility');
@@ -170,11 +278,15 @@ function moveContent(
   const from = labelFrame(node, state.flight!);
   const to = labelFrame(target, card);
   target.dataset.flightTarget = '';
-  if (fixedLayout || (singleLine(node) && singleLine(target)))
+  const morphTitle =
+    node.classList.contains('glass-flight-label') &&
+    singleLine(node) &&
+    singleLine(target);
+  if (fixedLayout || morphTitle)
     return [animate(state, node, [from, to], duration)];
 
-  // Each wrapped layout keeps its own typography and line breaks while both
-  // follow the same path. Their short, staggered crossfade avoids colliding text.
+  // Descriptions and wrapped titles keep two stable typeset layouts as they move.
+  // This also avoids WebKit losing paragraph geometry during font-size animation.
   const incoming = node.cloneNode(true) as HTMLElement;
   incoming.dataset.flightCopy = 'destination';
   Object.assign(incoming.style, to);
@@ -269,11 +381,12 @@ document.addEventListener(
     pendingFocus = undefined;
     const state: Navigation = {
       id: ++sequence,
-      mode: 'fade',
+      mode: 'reveal',
       keyboard,
       traversal: event.navigationType === 'traverse',
       hash: event.to.hash,
       animations: [],
+      cards: new Map(),
       content: [],
     };
     active = state;
@@ -316,17 +429,17 @@ document.addEventListener(
         launchFlight(state, source);
       }
       document.documentElement.dataset.motion = state.mode;
-      const outgoing = layers(document);
+      layers(document);
       const incoming = layers(next);
       next.documentElement.dataset.motion = state.mode;
       if (!reduced.matches) next.documentElement.dataset.entering = '';
-      // A visible, deliberate exit occurs before swapping HTML, including Blog and
-      // wordmark clicks (not only browser history). The material is never snapped.
+      // Retract content from bottom to top while the glass closes. A participating
+      // shared surface stays intact in the flight layer until the document swap.
       if (!reduced.matches)
         await Promise.all(
-          outgoing.map((element) =>
-            animate(state, element, [{ opacity: 1 }, { opacity: 0 }], 220),
-          ),
+          [
+            ...document.querySelectorAll<HTMLElement>('.page-stage .glass'),
+          ].flatMap((card) => revealCard(state, card, false)),
         );
       if (active !== state || event.signal.aborted) return;
       if (!incoming.length) delete next.documentElement.dataset.entering;
@@ -365,7 +478,6 @@ document.addEventListener('astro:after-swap', async () => {
   pendingFocus = state;
   const target = state.item ? cardFor(document, state.item) : undefined;
   const moving = !!state.flight && !!target && visible(target);
-  const tagFlight = state.item?.kind === 'tag' && moving;
   const travel = 420;
   const jobs: Promise<unknown>[] = [];
   if (moving && state.flight && target) {
@@ -458,46 +570,42 @@ document.addEventListener('astro:after-swap', async () => {
       }
     }
   } else if (state.flight) {
-    const surface = state.flight.querySelector<HTMLElement>('.glass-surface')!;
-    jobs.push(animate(state, surface, [{ opacity: 1 }, { opacity: 0 }], 180));
-    if (state.flightLabel)
-      jobs.push(
-        animate(
-          state,
-          state.flightLabel,
-          [{ opacity: 1 }, { opacity: 0 }],
-          180,
-        ),
-      );
-    for (const { node } of state.content)
-      jobs.push(animate(state, node, [{ opacity: 1 }, { opacity: 0 }], 180));
-    state.mode = 'fade';
-    document.documentElement.dataset.motion = 'fade';
+    jobs.push(...revealCard(state, state.flight, false));
+    state.mode = 'reveal';
+    document.documentElement.dataset.motion = 'reveal';
   }
-  for (const element of layers(document)) {
-    if (element.hasAttribute('data-flight-target')) continue;
-    const material = element.dataset.navLayer === 'surface';
-    let delay = moving ? 300 : 0;
-    if (tagFlight && element.closest('.tag-heading')) delay = 200;
-    if (moving && element.closest('.article-heading .eyebrow')) delay = 200;
-    if (moving && element.closest('.reading-card')) delay = 330;
-    if (moving && element.closest('.toc')) delay = 370;
-    // Only text moves. The refractive surface fades in place against its real
-    // backdrop; no opacity/transform animation is applied to the card ancestor.
-    jobs.push(
-      animate(
-        state,
-        element,
-        material
-          ? [{ opacity: 0 }, { opacity: 1 }]
-          : [
-              { opacity: 0, transform: 'translateY(6px)' },
-              { opacity: 1, transform: 'none' },
-            ],
-        260,
-        delay,
-      ),
-    );
+  layers(document);
+  const cards = [
+    ...document.querySelectorAll<HTMLElement>('.page-stage .glass'),
+  ];
+  for (const [index, card] of cards.entries()) {
+    if (reduced.matches) continue;
+    if (moving && card === target) {
+      if (!state.cards.has(card)) state.cards.set(card, card.inert);
+      card.inert = true;
+      // The shared panel already exists. Only its new, unpaired content streams in.
+      for (const child of card.children) {
+        if (
+          !(child instanceof HTMLElement) ||
+          child.hasAttribute('data-flight-target')
+        )
+          continue;
+        jobs.push(
+          revealText(
+            state,
+            child,
+            true,
+            240,
+            child.classList.contains('eyebrow') ? 200 : 300,
+          ),
+        );
+      }
+      continue;
+    }
+    let delay = moving ? 300 : Math.min(index * 32, 96);
+    if (moving && card.classList.contains('reading-card')) delay = 330;
+    if (moving && card.classList.contains('toc')) delay = 370;
+    jobs.push(...revealCard(state, card, true, delay));
   }
   await Promise.all(jobs);
   if (active !== state) return;
@@ -536,7 +644,7 @@ document.addEventListener('astro:page-load', () => {
   const state = pendingFocus;
   if (!state) return;
   state.pageLoaded = true;
-  if (!state.flightLabel || state.motionFinished) {
+  if (state.motionFinished) {
     focusDestination(state);
     pendingFocus = undefined;
   }

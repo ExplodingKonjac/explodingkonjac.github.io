@@ -1,0 +1,114 @@
+import type { Language, Messages } from '../config/i18n';
+import type { TransitionBeforeSwapEvent } from 'astro:transitions/client';
+
+// Serialized by Locale.astro for synchronous, pre-paint translation. Keep this
+// function self-contained: type imports are erased before it is inlined.
+export function initializeLocale(
+  messages: Messages,
+  languageStorageKey: string,
+) {
+  if (!window.__blogLocale) {
+    let preference: Language | undefined;
+    try {
+      const stored = localStorage.getItem(languageStorageKey);
+      if (stored === 'en' || stored === 'zh-CN') preference = stored;
+    } catch {}
+    const systemLanguage = (): Language =>
+      /^zh(?:-|$)/i.test(navigator.language) ? 'zh-CN' : 'en';
+    let language = preference ?? systemLanguage();
+    const text = (key: string, params: Record<string, string | number> = {}) =>
+      (messages[language][key] ?? messages.en[key] ?? key).replace(
+        /\{(\w+)\}/g,
+        (token: string, name: string) => String(params[name] ?? token),
+      );
+    const apply = (doc = document) => {
+      doc.documentElement.lang = language;
+      for (const [attribute, target] of [
+        ['data-i18n', null],
+        ['data-i18n-aria', 'aria-label'],
+        ['data-i18n-placeholder', 'placeholder'],
+        ['data-i18n-content', 'content'],
+      ]) {
+        doc.querySelectorAll<HTMLElement>(`[${attribute}]`).forEach((node) => {
+          const value = text(
+            node.getAttribute(attribute!)!,
+            JSON.parse(node.dataset.i18nParams || '{}'),
+          );
+          if (target) node.setAttribute(target, value);
+          else node.textContent = value;
+        });
+      }
+      const format = new Intl.DateTimeFormat(language, {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        timeZone: 'UTC',
+      });
+      doc
+        .querySelectorAll<HTMLTimeElement>('time[data-ui-date]')
+        .forEach((node) => {
+          node.textContent = format.format(new Date(node.dateTime));
+        });
+      const button = doc.querySelector<HTMLButtonElement>('.language-toggle');
+      if (button) {
+        button.hidden = false;
+        button.setAttribute('aria-label', text('language.switch'));
+        button.title = text('language.switch');
+        button.querySelector('span')!.textContent =
+          language === 'en' ? 'EN' : '中';
+      }
+      const theme = doc.querySelector<HTMLButtonElement>('.theme-toggle');
+      if (theme) {
+        const key =
+          doc.documentElement.dataset.theme === 'dark'
+            ? 'theme.light'
+            : 'theme.dark';
+        theme.setAttribute('aria-label', text(key));
+        theme.title = text(key);
+      }
+      delete doc.documentElement.dataset.localePending;
+    };
+    const update = () => {
+      language = preference ?? systemLanguage();
+      apply();
+      document.dispatchEvent(new Event('blog:language-change'));
+    };
+    window.__blogLocale = {
+      get language() {
+        return language;
+      },
+      text,
+      apply,
+    };
+    document.addEventListener('click', (event) => {
+      if (
+        !(event.target instanceof Element) ||
+        !event.target.closest('.language-toggle')
+      )
+        return;
+      preference = language === 'en' ? 'zh-CN' : 'en';
+      try {
+        localStorage.setItem(languageStorageKey, preference);
+      } catch {}
+      update();
+    });
+    window.addEventListener('languagechange', () => {
+      if (!preference) update();
+    });
+    window.addEventListener('storage', (event) => {
+      if (event.key !== languageStorageKey && event.key !== null) return;
+      preference =
+        event.newValue === 'en' || event.newValue === 'zh-CN'
+          ? event.newValue
+          : undefined;
+      update();
+    });
+    document.addEventListener(
+      'astro:before-swap',
+      (event: TransitionBeforeSwapEvent) => apply(event.newDocument),
+    );
+    document.addEventListener('astro:after-swap', () => apply());
+    document.addEventListener('astro:page-load', () => apply());
+  }
+  window.__blogLocale.apply();
+}

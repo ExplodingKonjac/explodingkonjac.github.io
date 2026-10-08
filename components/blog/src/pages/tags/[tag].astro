@@ -13,10 +13,18 @@ export async function getStaticPaths() {
 const { tag, posts } = Astro.props;
 ---
 
-<Base title={`Tag: ${tag}`} description={`Notes about ${tag}.`}>
+<Base
+  title={`Tag: ${tag}`}
+  description={`Notes about ${tag}.`}
+  titleKey="title.tag"
+  descriptionKey="meta.tag"
+  tag={tag}
+>
   <div class="page-heading tag-heading glass" data-tag-key={tag}>
     <GlassSurface />
-    <p class="eyebrow">BY TOPIC</p>
+    <p class="eyebrow" data-i18n="tags.eyebrow">
+      BY TOPIC
+    </p>
     <h1 data-tag-label>
       {tag}
       <span>.</span>

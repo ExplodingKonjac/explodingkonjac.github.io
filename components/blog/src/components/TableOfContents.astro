@@ -8,8 +8,8 @@ const { headings } = Astro.props;
 
 <aside class="toc glass glass-clear">
   <GlassSurface />
-  <nav class="toc-desktop" aria-label="On this page">
-    <h2>On this page</h2>
+  <nav class="toc-desktop" aria-label="On this page" data-i18n-aria="toc.title">
+    <h2 data-i18n="toc.title">On this page</h2>
     <ol>
       {headings.map((heading) => (
         <li class:list={{ 'toc-nested': heading.depth === 3 }}>
@@ -20,9 +20,10 @@ const { headings } = Astro.props;
   </nav>
   <details class="toc-mobile">
     <summary>
-      On this page <span aria-hidden="true">+</span>
+      <span data-i18n="toc.title">On this page</span>{' '}
+      <span aria-hidden="true">+</span>
     </summary>
-    <nav aria-label="On this page">
+    <nav aria-label="On this page" data-i18n-aria="toc.title">
       <ol>
         {headings.map((heading) => (
           <li class:list={{ 'toc-nested': heading.depth === 3 }}>

@@ -14,7 +14,7 @@ html[data-motion] .tag-index a {
   transition: none;
 }
 html[data-entering] [data-nav-layer] {
-  opacity: 0;
+  visibility: hidden;
 }
 [data-flight-target] {
   visibility: hidden;

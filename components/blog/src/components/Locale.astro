@@ -1,0 +1,9 @@
+---
+import { initializeLocale } from '../scripts/locale';
+import { messages, languageStorageKey } from '../config/i18n';
+// Escape '<' so dictionary strings can never terminate the inline script.
+const data = JSON.stringify(messages).replace(/</g, '\\u003c');
+const script = `(${initializeLocale.toString()})(${data}, ${JSON.stringify(languageStorageKey)});`;
+---
+
+<script is:inline set:html={script} />

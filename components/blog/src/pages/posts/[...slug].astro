@@ -32,26 +32,30 @@ const contents = headings.filter(
   <article>
     <div class="page-heading article-heading glass" data-post-key={post.id}>
       <GlassSurface />
-      <p class="eyebrow">A NOTE FROM THE NOTEBOOK</p>
+      <p class="eyebrow" data-i18n="post.eyebrow">
+        A NOTE FROM THE NOTEBOOK
+      </p>
       <h1 data-post-title>{post.data.title}</h1>
       <p data-post-description>{post.data.description}</p>
       <div class="post-date">
-        <time datetime={post.data.pubDate.toISOString()}>
+        <time datetime={post.data.pubDate.toISOString()} data-ui-date>
           {formatDate(post.data.pubDate)}
         </time>
         {post.data.updatedDate && (
           <span>
-            Updated{' '}
-            <time datetime={post.data.updatedDate.toISOString()}>
+            <span data-i18n="post.updated">Updated</span>{' '}
+            <time datetime={post.data.updatedDate.toISOString()} data-ui-date>
               {formatDate(post.data.updatedDate)}
             </time>
           </span>
         )}
         {post.data.draft && (
-          <span class="draft-badge">Draft · local preview</span>
+          <span class="draft-badge" data-i18n="post.preview">
+            Draft · local preview
+          </span>
         )}
       </div>
-      <ul class="tags" aria-label="Post tags">
+      <ul class="tags" aria-label="Post tags" data-i18n-aria="post.tags">
         {post.data.tags.map((tag) => (
           <li>
             <a href={tagUrl(tag)}>{tag}</a>

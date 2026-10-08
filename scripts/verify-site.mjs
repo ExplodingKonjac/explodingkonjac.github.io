@@ -111,6 +111,8 @@ export async function verifySite(root = path.join(repoRoot, '_site')) {
   for (const file of [
     `${blogRoot}rss.xml`,
     `${blogRoot}sitemap-index.xml`,
+    `${blogRoot}search/index.html`,
+    `${blogRoot}search-index.json`,
     '404.html',
     'robots.txt',
   ]) {

@@ -4,8 +4,9 @@ import { postUrl, tagUrl, formatDate } from '../lib/posts';
 import GlassSurface from './GlassSurface.astro';
 interface Props {
   posts: CollectionEntry<'posts'>[];
+  searchable?: boolean;
 }
-const { posts } = Astro.props;
+const { posts, searchable = false } = Astro.props;
 ---
 
 <ol class="post-list">
@@ -20,10 +21,14 @@ const { posts } = Astro.props;
         ↗
       </span>
       <div class="post-date">
-        <time datetime={post.data.pubDate.toISOString()}>
+        <time datetime={post.data.pubDate.toISOString()} data-ui-date>
           {formatDate(post.data.pubDate)}
         </time>
-        {post.data.draft && <span class="draft-badge">Draft</span>}
+        {post.data.draft && (
+          <span class="draft-badge" data-i18n="post.draft">
+            Draft
+          </span>
+        )}
       </div>
       <h2 data-post-title>
         <a class="post-link" href={postUrl(post)}>
@@ -31,7 +36,8 @@ const { posts } = Astro.props;
         </a>
       </h2>
       <p data-post-description>{post.data.description}</p>
-      <ul class="tags" aria-label="Post tags">
+      {searchable && <p class="search-excerpt" hidden />}
+      <ul class="tags" aria-label="Post tags" data-i18n-aria="post.tags">
         {post.data.tags.map((tag) => (
           <li>
             <a href={tagUrl(tag)}>{tag}</a>
@@ -44,6 +50,6 @@ const { posts } = Astro.props;
 {posts.length === 0 && (
   <div class="empty-state glass">
     <GlassSurface />
-    <p>No published notes yet.</p>
+    <p data-i18n="post.empty">No published notes yet.</p>
   </div>
 )}

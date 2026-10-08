@@ -13,6 +13,7 @@
     "@astrojs/rss": "4.0.19",
     "@astrojs/sitemap": "3.7.4",
     "astro": "7.3.6",
+    "cheerio": "1.2.0",
     "katex": "0.16.47",
     "rehype-katex": "7.0.1",
     "remark-directive": "4.0.0",

@@ -6,14 +6,22 @@ const posts = await publishedPosts();
 const tags = [...new Set(posts.flatMap((post) => post.data.tags))].sort();
 ---
 
-<Base title="Tags" description="Browse the notebook by topic.">
+<Base
+  title="Tags"
+  description="Browse the notebook by topic."
+  titleKey="title.tags"
+  descriptionKey="meta.tags"
+>
   <div class="page-heading glass">
     <GlassSurface />
-    <p class="eyebrow">BY TOPIC</p>
+    <p class="eyebrow" data-i18n="tags.eyebrow">
+      BY TOPIC
+    </p>
     <h1>
-      Threads to follow<span>.</span>
+      <span data-i18n="tags.title">Threads to follow</span>
+      <span>.</span>
     </h1>
-    <p>Browse the notebook by subject.</p>
+    <p data-i18n="tags.description">Browse the notebook by subject.</p>
   </div>
   <ul class="tag-index">
     {tags.map((tag) => (
