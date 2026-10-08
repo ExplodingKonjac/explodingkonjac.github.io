@@ -5,7 +5,7 @@ import { postSchema } from './lib/post-schema';
 const posts = defineCollection({
   loader: glob({
     pattern: '**/[^_]*.md',
-    base: './src/content/posts',
+    base: './content/posts',
     generateId: ({ entry, data }) =>
       typeof data.slug === 'string'
         ? data.slug

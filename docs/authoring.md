@@ -1,6 +1,6 @@
 # Writing a post
 
-Create `components/blog/src/content/posts/your-post/index.md` and keep illustrations alongside it. The directory becomes `/blog/posts/your-post/`; nested directories work. Files beginning with `_` are templates and not loaded.
+Create `components/blog/content/posts/your-post/index.md` and keep illustrations alongside it. The directory becomes `/blog/posts/your-post/`; nested directories work. Files beginning with `_` are templates and not loaded.
 
 ```yaml
 ---
