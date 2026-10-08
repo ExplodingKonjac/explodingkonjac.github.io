@@ -292,6 +292,54 @@ details.environment {
   border: 0;
   background: transparent;
 }
+.citation {
+  font-size: 0.85em;
+  font-variant-numeric: tabular-nums;
+}
+.citation a {
+  padding: 1px 3px;
+  border-radius: 4px;
+  text-decoration: none;
+  transition:
+    background-color 180ms var(--ease),
+    color 180ms var(--ease);
+}
+.citation a:hover,
+.citation a:focus-visible {
+  background: var(--active);
+}
+.environment-reference {
+  margin-top: 40px;
+  padding: 24px 0 0;
+  border-width: 1px 0 0;
+  border-radius: 0;
+  background: transparent;
+  font-size: 14px;
+}
+.reference-list {
+  margin: 16px 0 0;
+  padding-left: 2.5em;
+}
+.reference-list > li {
+  margin: 8px 0;
+  padding: 4px 8px;
+  border-radius: 8px;
+  transition: background-color 220ms var(--ease);
+}
+.reference-list > li::marker {
+  content: '[' counter(list-item) '] ';
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.reference-list > li:target {
+  background: var(--active);
+}
+.reference-list > li > :first-child {
+  margin-top: 0;
+}
+.reference-list > li > :last-child {
+  margin-bottom: 0;
+}
 figcaption {
   margin-top: 16px;
   color: var(--muted);

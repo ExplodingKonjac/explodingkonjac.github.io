@@ -15,6 +15,7 @@ const labels = Object.freeze({
   tip: 'Tip',
   warning: 'Warning',
   figure: 'Figure',
+  reference: 'References',
 });
 
 /** Render Markdown container directives without requiring JSX or client JavaScript. */

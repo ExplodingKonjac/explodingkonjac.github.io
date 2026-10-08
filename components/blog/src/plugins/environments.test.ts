@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { unified } from 'unified';
 import remarkParse from 'remark-parse';
 import remarkDirective from 'remark-directive';
+import remarkCjkFriendly from 'remark-cjk-friendly';
 import remarkMath from 'remark-math';
 import remarkRehype from 'remark-rehype';
 import rehypeKatex from 'rehype-katex';
@@ -15,6 +16,7 @@ async function html(markdown: string) {
   return String(
     await unified()
       .use(remarkParse)
+      .use(remarkCjkFriendly)
       .use(remarkDirective)
       .use(remarkMath)
       .use(environments)
@@ -24,6 +26,31 @@ async function html(markdown: string) {
       .process(markdown),
   );
 }
+
+test('renders CJK emphasis around punctuation, links, and math without changing literals', async () => {
+  const output = await html(
+    String.raw`
+- **环（Ring）**是由元素集合和运算组成。
+
+中文**（说明）**继续。
+
+遵守**[三五零原则](https://example.com/rules)**，以及**$x^2$（公式）**的写法。
+
+\*\*环（Ring）\*\*是原样显示。
+
+` + '`**环（Ring）**`',
+  );
+  assert.match(output, /<li><strong>环（Ring）<\/strong>是由/);
+  assert.match(output, /中文<strong>（说明）<\/strong>继续/);
+  assert.match(
+    output,
+    /<strong><a href="https:\/\/example.com\/rules">三五零原则<\/a><\/strong>/,
+  );
+  assert.match(output, /<strong><span class="katex">/);
+  assert.match(output, /（公式）<\/strong>的写法/);
+  assert.match(output, /<p>\*\*环（Ring）\*\*是原样显示。<\/p>/);
+  assert.match(output, /<code>\*\*环（Ring）\*\*<\/code>/);
+});
 
 test('renders optional titles, anchors, and Markdown within environments', async () => {
   const output = await html(

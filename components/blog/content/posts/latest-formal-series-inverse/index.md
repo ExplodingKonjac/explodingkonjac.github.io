@@ -9,7 +9,7 @@ draft: false
 ## 声明
 
 :::note[来源说明]
-本文大部分译自参考文献 [1]，还有一些自己的理解和补充。
+本文大部分译自参考文献 [@noshi91-2024-fps-composition]，还有一些自己的理解和补充。
 
 :::
 
@@ -27,7 +27,7 @@ $$
 
 ## Bostan-Mori 算法
 
-该算法提出于参考文献 [2]。
+该算法提出于参考文献 [@bostan-mori-2021]。
 
 对于给定的 $n$ 次多项式 $f(x),g(x)$ 以及 $k$，Bostan-Mori 算法能够求出：
 
@@ -88,7 +88,7 @@ $$
 
 ## 求解多项式复合逆
 
-原文题有另外的一个解法，来自参考文献 [3]。其中用到了复合逆。我们可以通过一种“算两次”的方法反解出复合逆。下面介绍这种方法：
+原文题有另外的一个解法，来自参考文献 [@zscoder-generating-functions-part2]。其中用到了复合逆。我们可以通过一种“算两次”的方法反解出复合逆。下面介绍这种方法：
 
 我们仍然要求 $[x^k]\dfrac{1}{1-yf(x)}$。但是这次我们设 $H(x)=\dfrac{1}{1-yx}$ 然后使用拉格朗日反演，设 $g(x)$ 为 $f(x)$ 的复合逆，那么：
 
@@ -122,7 +122,7 @@ $$
 
 ## 求解多项式复合函数
 
-根据参考文献 [4]，多项式复合函数可以与多项式复合逆在相同复杂度内计算。
+根据参考文献 [@brent-kung-1978]，多项式复合函数可以与多项式复合逆在相同复杂度内计算。
 
 下面讲解如何使用复合逆求解复合函数。
 
@@ -241,10 +241,11 @@ $$
 
 ## 参考文献
 
-[1] noshi91. FPS の合成と逆関数、冪乗の係数列挙 $\Theta(n (\log(n))^2)$. <https://noshi91.hatenablog.com/entry/2024/03/16/224034>.
+:::reference
 
-[2] A. Bostan & R. Mori (2021). A Simple and Fast Algorithm for Computing the $N$-th Term of a Linearly Recurrent Sequence. [arXiv 2008.08822](https://arxiv.org/abs/2008.08822) [cs.SC]
+- [@noshi91-2024-fps-composition] noshi91. FPS の合成と逆関数、冪乗の係数列挙 $\Theta(n (\log(n))^2)$. <https://noshi91.hatenablog.com/entry/2024/03/16/224034>.
+- [@bostan-mori-2021] A. Bostan & R. Mori (2021). A Simple and Fast Algorithm for Computing the $N$-th Term of a Linearly Recurrent Sequence. [arXiv 2008.08822](https://arxiv.org/abs/2008.08822) [cs.SC]
+- [@zscoder-generating-functions-part2] zscoder. Generating Functions in Competitive Programming (Part 2). <https://codeforces.com/blog/entry/77551>.
+- [@brent-kung-1978] R. P. Brent and H. T. Kung (1978). Fast Algorithms for Manipulating Formal Power Series. J. ACM 25, 4 (Oct. 1978), 581–595.
 
-[3] zscoder. Generating Functions in Competitive Programming (Part 2). <https://codeforces.com/blog/entry/77551>.
-
-[4] R. P. Brent and H. T. Kung (1978). Fast Algorithms for Manipulating Formal Power Series. J. ACM 25, 4 (Oct. 1978), 581–595.
+:::
