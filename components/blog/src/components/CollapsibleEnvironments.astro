@@ -1,0 +1,127 @@
+<script>
+  let dispose: (() => void) | undefined;
+
+  function initializeEnvironments() {
+    dispose?.();
+    const controller = new AbortController();
+    const { signal } = controller;
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+    const cleanups: (() => void)[] = [];
+
+    document
+      .querySelectorAll<HTMLDetailsElement>('.prose details.environment')
+      .forEach((details) => {
+        const summary = details.querySelector<HTMLElement>(':scope > summary');
+        if (!summary) return;
+
+        let animation: Animation | undefined;
+        let expanded = details.open;
+        let destination = 0;
+        let deadline = 0;
+
+        const finish = () => {
+          if (!animation) return;
+          const previous = animation;
+          animation = undefined;
+          details.open = expanded;
+          delete details.dataset.environmentMotion;
+          summary.removeAttribute('aria-expanded');
+          previous.cancel();
+        };
+
+        const targetHeight = () => {
+          const style = getComputedStyle(details);
+          const bottom = expanded ? details.lastElementChild! : summary;
+          // Child geometry stays intrinsic while the enclosing box is animated.
+          return (
+            bottom.getBoundingClientRect().bottom -
+            details.getBoundingClientRect().top +
+            parseFloat(style.paddingBottom) +
+            parseFloat(style.borderBottomWidth)
+          );
+        };
+
+        const move = (start: number, end: number, duration: number) => {
+          animation?.cancel();
+          destination = end;
+          const next = details.animate(
+            [{ height: `${start}px` }, { height: `${end}px` }],
+            {
+              duration,
+              easing: getComputedStyle(details)
+                .getPropertyValue('--ease')
+                .trim(),
+              fill: 'both',
+            },
+          );
+          animation = next;
+          next.finished.then(
+            () => {
+              if (animation === next) finish();
+            },
+            () => {},
+          );
+        };
+
+        summary.addEventListener(
+          'click',
+          (event) => {
+            if (
+              event.defaultPrevented ||
+              (event.target instanceof Element &&
+                event.target.closest('a[href]'))
+            )
+              return;
+            if (reduced.matches) return;
+            event.preventDefault();
+
+            const start = details.getBoundingClientRect().height;
+            expanded = animation ? !expanded : !details.open;
+            // Keep native content visible until the closing motion finishes.
+            details.open = true;
+            details.dataset.environmentMotion = expanded
+              ? 'opening'
+              : 'closing';
+            summary.setAttribute('aria-expanded', String(expanded));
+            const time = getComputedStyle(details)
+              .getPropertyValue('--environment-duration')
+              .trim();
+            // Production CSS can shorten milliseconds to seconds.
+            const duration =
+              parseFloat(time) * (time.endsWith('ms') ? 1 : 1000);
+            deadline = performance.now() + duration;
+            move(start, targetHeight(), duration);
+          },
+          { signal },
+        );
+
+        // Nested disclosures, image loads, and wrapped text can change the target
+        // height mid-animation. Retarget from the live frame without a jump.
+        const observer = new ResizeObserver(() => {
+          if (!animation) return;
+          const end = targetHeight();
+          if (Math.abs(end - destination) < 0.5) return;
+          move(
+            details.getBoundingClientRect().height,
+            end,
+            Math.max(80, deadline - performance.now()),
+          );
+        });
+        for (const child of details.children) observer.observe(child);
+        reduced.addEventListener('change', finish, { signal });
+        cleanups.push(() => {
+          observer.disconnect();
+          finish();
+        });
+      });
+
+    dispose = () => {
+      controller.abort();
+      cleanups.forEach((cleanup) => cleanup());
+    };
+  }
+
+  document.addEventListener('astro:before-swap', () => dispose?.());
+  document.addEventListener('astro:page-load', initializeEnvironments);
+  initializeEnvironments();
+</script>

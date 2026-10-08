@@ -54,11 +54,14 @@ const environments: Plugin<[], Root> = () => (tree, file) => {
       node.children[0].data?.directiveLabel
         ? (node.children.shift() as Paragraph)
         : null;
+    const collapsible = ['note', 'tip', 'warning'].includes(node.name);
     node.data = {
       ...node.data,
-      hName: node.name === 'figure' ? 'figure' : 'section',
+      hName:
+        node.name === 'figure' ? 'figure' : collapsible ? 'details' : 'section',
       hProperties: {
         className: ['environment', `environment-${node.name}`],
+        ...(collapsible ? { open: true } : {}),
         ...(attributes.id ? { id: attributes.id } : {}),
       },
     };
@@ -75,7 +78,10 @@ const environments: Plugin<[], Root> = () => (tree, file) => {
       ];
       node.children.unshift({
         type: 'paragraph',
-        data: { hProperties: { className: ['environment-title'] } },
+        data: {
+          ...(collapsible ? { hName: 'summary' } : {}),
+          hProperties: { className: ['environment-title'] },
+        },
         children: [{ type: 'strong', children: titleChildren }],
       });
       if (node.name === 'proof')

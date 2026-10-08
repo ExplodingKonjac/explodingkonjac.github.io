@@ -240,6 +240,41 @@ html:has(.image-lightbox[open]) {
   color: var(--accent);
   font-size: 14px;
 }
+details.environment {
+  --environment-duration: 320ms;
+}
+.environment[data-environment-motion] {
+  overflow: clip;
+}
+.environment[data-environment-motion='closing'] {
+  --environment-duration: 240ms;
+}
+.environment > summary.environment-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  cursor: pointer;
+  list-style: none;
+}
+.environment > summary.environment-title::-webkit-details-marker {
+  display: none;
+}
+.environment > summary.environment-title::after {
+  content: '';
+  flex: 0 0 6px;
+  width: 6px;
+  height: 6px;
+  margin-right: 2px;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: rotate(-45deg);
+  transition: transform var(--environment-duration) var(--ease);
+}
+.environment[open]:not([data-environment-motion='closing'])
+  > summary.environment-title::after {
+  transform: rotate(45deg);
+}
 .environment-proof {
   background: transparent;
 }

@@ -4,6 +4,7 @@ import Base from '../../layouts/Base.astro';
 import GlassSurface from '../../components/GlassSurface.astro';
 import TableOfContents from '../../components/TableOfContents.astro';
 import ImageLightbox from '../../components/ImageLightbox.astro';
+import CollapsibleEnvironments from '../../components/CollapsibleEnvironments.astro';
 import { publishedPosts, tagUrl, formatDate } from '../../lib/posts';
 
 export async function getStaticPaths() {
@@ -73,5 +74,6 @@ const contents = headings.filter(
       </div>
     </div>
   </article>
+  <CollapsibleEnvironments />
   <ImageLightbox />
 </Base>

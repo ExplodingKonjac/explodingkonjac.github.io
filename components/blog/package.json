@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "pnpm --workspace-root dev",
     "check": "astro check",
-    "build": "astro build",
+    "build": "astro build --force",
     "preview": "astro preview"
   },
   "dependencies": {
