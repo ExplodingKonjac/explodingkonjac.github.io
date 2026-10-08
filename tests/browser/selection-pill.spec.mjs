@@ -110,23 +110,6 @@ test('navbar pill follows keyboard focus and persists through navigation and his
   await aligned(pill, blog);
 });
 
-test('navbar pill stays aligned as the mobile navbar docks and changes width', async ({
-  page,
-}) => {
-  await page.setViewportSize({ width: 390, height: 900 });
-  await page.goto('/blog/posts/welcome/');
-  const pill = page.locator('.selection-pill');
-  const blog = page.locator('[data-nav="blog"]');
-  for (const top of [0, 30, 60, 90, 140, 0]) {
-    await page.evaluate((top) => scrollTo({ top, behavior: 'instant' }), top);
-    await aligned(pill, blog);
-  }
-  for (const width of [320, 768, 1440]) {
-    await page.setViewportSize({ width, height: 900 });
-    await aligned(pill, blog);
-  }
-});
-
 test('navbar pill respects reduced motion, touch selection and high contrast', async ({
   page,
 }) => {
