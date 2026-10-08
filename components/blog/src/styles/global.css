@@ -316,13 +316,6 @@ html[data-locale-pending] [data-i18n-placeholder] {
   padding: 44px 40px;
   margin-bottom: var(--gap);
 }
-.eyebrow {
-  font-size: 10px;
-  font-weight: 650;
-  letter-spacing: 2.1px;
-  color: var(--muted);
-  margin: 0 0 24px;
-}
 h1 {
   text-wrap: wrap;
   font-size: clamp(34px, 4.4vw, 54px);
@@ -333,7 +326,7 @@ h1 {
   max-width: none;
   overflow-wrap: anywhere;
 }
-.page-heading > p:not(.eyebrow) {
+.page-heading > p {
   color: var(--muted);
   font-size: 17px;
   line-height: 1.8;
@@ -908,12 +901,7 @@ figcaption {
     font-size: clamp(32px, 8.3vw, 44px);
     letter-spacing: -1.3px;
   }
-  .eyebrow {
-    font-size: 9px;
-    margin-bottom: 20px;
-    letter-spacing: 1.8px;
-  }
-  .page-heading > p:not(.eyebrow) {
+  .page-heading > p {
     font-size: 15px;
     margin-top: 18px;
   }
@@ -1076,7 +1064,6 @@ figcaption {
 
 /* Explicit text colors and their surfaces change together during a theme switch. */
 [data-theme-ready] a,
-[data-theme-ready] .eyebrow,
 [data-theme-ready] .page-heading > p,
 [data-theme-ready] .post-date,
 [data-theme-ready] .post-card p,

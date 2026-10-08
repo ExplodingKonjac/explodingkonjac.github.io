@@ -8,20 +8,14 @@ const tags = [...new Set(posts.flatMap((post) => post.data.tags))].sort();
 
 <Base
   title="Tags"
-  description="Browse the notebook by topic."
+  description="Browse posts by tag."
   titleKey="title.tags"
   descriptionKey="meta.tags"
 >
   <div class="page-heading glass">
     <GlassSurface />
-    <p class="eyebrow" data-i18n="tags.eyebrow">
-      BY TOPIC
-    </p>
-    <h1>
-      <span data-i18n="tags.title">Threads to follow</span>
-      <span>.</span>
-    </h1>
-    <p data-i18n="tags.description">Browse the notebook by subject.</p>
+    <h1 data-i18n="tags.title">Tags</h1>
+    <p data-i18n="tags.description">Select a tag to browse related posts.</p>
   </div>
   <ul class="tag-index">
     {tags.map((tag) => (

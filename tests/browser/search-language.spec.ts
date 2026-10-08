@@ -177,7 +177,7 @@ test('language choice persists without translating authored post text or tag nam
   ]);
   await page.locator('[data-nav="tags"]').click();
   await settle(page);
-  await expect(page.locator('h1')).toContainText('循着线索探索');
+  await expect(page.locator('h1')).toHaveText('标签');
   await page.locator('[data-nav="search"]').click();
   await settle(page);
   await expect(page.getByRole('searchbox')).toHaveAttribute(
@@ -237,7 +237,7 @@ test('language follows system changes until chosen and can change during card mo
   await page.locator('.language-toggle').click();
   await settle(page);
   await expect(page.locator('html')).toHaveAttribute('lang', 'zh-CN');
-  await expect(page.locator('h1')).toContainText('循着线索探索');
+  await expect(page.locator('h1')).toHaveText('标签');
   await expect(page.locator('.page-stage [inert], .glass-flight')).toHaveCount(
     0,
   );

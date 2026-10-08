@@ -8,21 +8,15 @@ const posts = await publishedPosts();
 
 <Base
   title="Blog"
-  description="Notes on mathematics, algorithms, and technology."
+  description="Browse all published posts, newest first."
   titleKey="title.blog"
   descriptionKey="meta.blog"
 >
   <div class="page-heading glass">
     <GlassSurface />
-    <p class="eyebrow" data-i18n="home.eyebrow">
-      THE NOTEBOOK
-    </p>
-    <h1>
-      <span data-i18n="home.title">Thinking in writing</span>
-      <span>.</span>
-    </h1>
+    <h1 data-i18n="home.title">Blog posts</h1>
     <p data-i18n="home.description">
-      Mathematics, algorithms, and technology. Ideas worth working through.
+      Browse all published posts, newest first.
     </p>
   </div>
   <PostList posts={posts} />

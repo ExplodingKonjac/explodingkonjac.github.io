@@ -41,10 +41,6 @@ html[data-entering] [data-nav-layer] {
   color: var(--muted);
   transition: color 180ms ease;
 }
-.glass-flight-period {
-  position: absolute;
-  color: var(--accent);
-}
 .page-stage {
   position: relative;
   z-index: 1;

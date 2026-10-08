@@ -180,7 +180,7 @@ geometry over 420ms, carrying its title, description, and tag pills. Single-line
 titles change typography directly; descriptions and wrapped titles blend between two fixed layouts
 along the same path, so line breaks do not jump while the card grows. The date
 retracts and reveals at its different positions instead of crossing the title. The
-eyebrow, article body and ToC follow in sequence. This works
+article metadata, body and ToC follow in sequence. This works
 for Blog/wordmark links as well as browser history. Missing or clipped endpoints
 use the vertical reveal. Rapid navigation cancels and cleans up the previous sequence.
 No card ancestor animates opacity, and the material uses its final tint from its
@@ -195,7 +195,7 @@ keyboard focus moves to the real heading after the animation handoff.
 On Tags, a tile and its category header share a stable `data-tag-key`. Once the
 surrounding cards have collapsed, the selected glass moves upward and expands over
 420ms. Its label moves with it and changes font size, spacing, and line height
-directly, keeping the text sharp. The count retracts; the header eyebrow and
+directly, keeping the text sharp. The count retracts; the header description and
 post list enter as the panel settles. Returning to Tags reverses the transition
 and browser history restores focus to the originating tile. Labels that wrap
 crossfade at their final typography to avoid line-break jumps. Keyboard focus

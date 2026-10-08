@@ -335,13 +335,6 @@ function launchFlight(state: Navigation, card: HTMLElement) {
     label.textContent =
       state.item.kind === 'tag' ? state.item.key : flightText(originalLabel);
     Object.assign(label.style, labelFrame(originalLabel, card));
-    if (state.item.kind === 'tag') {
-      const period = document.createElement('span');
-      period.className = 'glass-flight-period';
-      period.textContent = '.';
-      period.style.opacity = state.mode === 'open' ? '0' : '1';
-      label.append(period);
-    }
     flight.append(label);
     state.flightLabel = label;
     state.sourceLabel = originalLabel;
@@ -515,7 +508,6 @@ document.addEventListener('astro:after-swap', async () => {
       const targetLabel = target.querySelector<HTMLElement>(
         titleSelector(state),
       )!;
-      const period = label.querySelector<HTMLElement>('.glass-flight-period');
       if (state.item?.kind === 'post') {
         jobs.push(...moveContent(state, label, targetLabel, target, travel));
       } else if (singleLine(label) && singleLine(targetLabel)) {
@@ -527,18 +519,6 @@ document.addEventListener('astro:after-swap', async () => {
             label,
             [labelFrame(label, state.flight), labelFrame(targetLabel, target)],
             travel,
-          ),
-        );
-        jobs.push(
-          animate(
-            state,
-            period!,
-            [
-              { opacity: state.mode === 'open' ? 0 : 1 },
-              { opacity: state.mode === 'open' ? 1 : 0 },
-            ],
-            160,
-            state.mode === 'open' ? 240 : 0,
           ),
         );
       } else {
@@ -590,15 +570,7 @@ document.addEventListener('astro:after-swap', async () => {
           child.hasAttribute('data-flight-target')
         )
           continue;
-        jobs.push(
-          revealText(
-            state,
-            child,
-            true,
-            240,
-            child.classList.contains('eyebrow') ? 200 : 300,
-          ),
-        );
+        jobs.push(revealText(state, child, true, 240, 300));
       }
       continue;
     }

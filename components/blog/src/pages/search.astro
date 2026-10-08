@@ -9,22 +9,16 @@ const posts = (await publishedPosts()).filter((post) => !post.data.draft);
 
 <Base
   title="Search"
-  description="Search titles, summaries, and post contents."
+  description="Find posts by title, summary, or content."
   titleKey="title.search"
   descriptionKey="search.description"
 >
   <div data-search>
     <div class="page-heading glass">
       <GlassSurface />
-      <p class="eyebrow" data-i18n="search.eyebrow">
-        FIND A NOTE
-      </p>
-      <h1>
-        <span data-i18n="search.title">Search the notebook</span>
-        <span>.</span>
-      </h1>
+      <h1 data-i18n="search.title">Search posts</h1>
       <p data-i18n="search.description">
-        Search titles, summaries, and post contents.
+        Find posts by title, summary, or content.
       </p>
       <form class="search-form" role="search" action={blogUrl('search')}>
         <label

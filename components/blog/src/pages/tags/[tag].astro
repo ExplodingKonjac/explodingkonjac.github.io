@@ -15,20 +15,15 @@ const { tag, posts } = Astro.props;
 
 <Base
   title={`Tag: ${tag}`}
-  description={`Notes about ${tag}.`}
+  description={`Posts tagged ${tag}.`}
   titleKey="title.tag"
   descriptionKey="meta.tag"
   tag={tag}
 >
   <div class="page-heading tag-heading glass" data-tag-key={tag}>
     <GlassSurface />
-    <p class="eyebrow" data-i18n="tags.eyebrow">
-      BY TOPIC
-    </p>
-    <h1 data-tag-label>
-      {tag}
-      <span>.</span>
-    </h1>
+    <h1 data-tag-label>{tag}</h1>
+    <p data-i18n="tag.description">Posts with this tag.</p>
   </div>
   <PostList posts={posts} />
 </Base>
