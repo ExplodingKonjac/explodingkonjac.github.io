@@ -19,7 +19,7 @@ async function html(markdown: string) {
       .use(remarkMath)
       .use(environments)
       .use(remarkRehype)
-      .use(rehypeKatex, { macros: mathMacros })
+      .use(rehypeKatex, { macros: { ...mathMacros } })
       .use(rehypeStringify)
       .process(markdown),
   );
@@ -46,6 +46,27 @@ test('renders nested directives, inline and display math, and shared macros', as
   assert.match(output, /class="katex"/);
   assert.match(output, /katex-display/);
   assert.doesNotMatch(output, /katex-error/);
+});
+test('renders matrices, aligned equations, colors, and local math macros', async () => {
+  const output = await html(String.raw`
+$\color{red}{x} \in \RR$
+
+$$
+\begin{bmatrix}1 & 2 \\ 3 & 4\end{bmatrix}
+$$
+
+$$
+\newcommand\lfl{\left\lfloor}
+\begin{aligned}
+f(n) &= \lfl n/2 \right\rfloor \\
+g(n) &= n^2
+\end{aligned}
+$$
+`);
+  assert.doesNotMatch(output, /katex-error/);
+  assert.match(output, /mtable/);
+  assert.match(output, /color:red/);
+  assert.deepEqual(Object.keys(mathMacros), ['\\RR', '\\NN', '\\ZZ', '\\QQ']);
 });
 test('renders an illustration and its caption as a semantic figure', async () => {
   const output = await html(

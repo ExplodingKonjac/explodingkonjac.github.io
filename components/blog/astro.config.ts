@@ -42,7 +42,8 @@ export default defineConfig({
       rehypePlugins: [
         [
           rehypeKatex,
-          { macros: mathMacros, throwOnError: true, strict: 'error' },
+          // KaTeX temporarily adds macros when rendering arrays and colors.
+          { macros: { ...mathMacros }, throwOnError: true, strict: 'error' },
         ],
         rehypeHeadingIds,
         headingLinks,

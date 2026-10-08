@@ -1,8 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360" viewBox="0 0 640 360" role="img" aria-labelledby="title desc">
-  <title id="title">A right triangle</title>
-  <desc id="desc">The vertical leg is a, the horizontal leg is b, and the hypotenuse is c.</desc>
-  <rect width="640" height="360" rx="12" fill="#eeeee7" />
-  <path d="M170 70V280H480Z" fill="#d7e9e0" stroke="#176c5b" stroke-width="3" />
-  <path d="M170 254H196V280" fill="none" stroke="#176c5b" stroke-width="2" />
-  <g fill="#202e34" font-family="Georgia,serif" font-size="28" font-style="italic"><text x="130" y="185">a</text><text x="320" y="320">b</text><text x="340" y="160">c</text></g>
-</svg>

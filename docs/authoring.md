@@ -39,7 +39,7 @@ Write the argument here.
 See [the theorem](#pythagoras).
 ```
 
-Supported blocks: `theorem`, `lemma`, `proposition`, `corollary`, `definition`, `proof`, `remark`, `note`, `tip`, `warning`, and `figure`. Titles/IDs are optional. IDs start with an ASCII letter and contain letters, digits, underscores or hyphens. Keep IDs unique. Attributes other than IDs are unsupported; unknown directive names fail with a source location.
+Supported blocks: `theorem`, `lemma`, `proposition`, `corollary`, `definition`, `example`, `proof`, `remark`, `note`, `tip`, `warning`, and `figure`. Titles/IDs are optional. IDs start with an ASCII letter and contain letters, digits, underscores or hyphens. Keep IDs unique. Attributes other than IDs are unsupported; unknown directive names fail with a source location.
 
 Use an extra colon on an outer block when nesting:
 

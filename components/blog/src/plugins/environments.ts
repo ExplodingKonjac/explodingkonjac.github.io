@@ -8,6 +8,7 @@ const labels = Object.freeze({
   proposition: 'Proposition',
   corollary: 'Corollary',
   definition: 'Definition',
+  example: 'Example',
   proof: 'Proof',
   remark: 'Remark',
   note: 'Note',
