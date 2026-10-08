@@ -6,10 +6,8 @@ export const site = Object.freeze({
   description:
     'Notes on mathematics, algorithms, and technology. A place for things I build.',
 });
-/** Build a blog-relative URL; pass logical, unencoded segments.
- * @param {...string} segments
- */
-export function blogUrl(...segments) {
+/** Build a blog-relative URL; pass logical, unencoded segments. */
+export function blogUrl(...segments: string[]): string {
   const suffix = segments
     .flatMap((segment) => segment.split('/'))
     .filter(Boolean)
@@ -18,7 +16,6 @@ export function blogUrl(...segments) {
   return `${site.base}${suffix}${suffix && !/\.[a-z0-9]+$/i.test(suffix) ? '/' : ''}`;
 }
 
-/** @param {string} path */
-export function absoluteUrl(path) {
+export function absoluteUrl(path: string): string {
   return new URL(path, site.origin).href;
 }

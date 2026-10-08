@@ -10,7 +10,7 @@ Packages are private and uniquely named. Dependencies belong to the packages con
 
 ## URLs and outputs
 
-The blog owns its origin, base path, identity, and URL helpers in `components/blog/src/config/site.mjs`. Astro configuration, templates, feeds, and browser code all use that module. It contains no registry of sibling components or homepage profile links.
+The blog owns its origin, base path, identity, and URL helpers in `components/blog/src/config/site.ts`. Astro configuration, templates, feeds, and browser code all use that module. It contains no registry of sibling components or homepage profile links.
 
 The homepage owns its metadata and project descriptions in `components/home/site.mjs`. Vite renders these into HTML, so navigation works without client JavaScript. Other apps set their own framework base paths. Homepage project links are curated independently of deployment entries.
 
@@ -23,6 +23,15 @@ The blog's generated pages and sitemap stay within `/blog/`. Its wordmark links 
 Search builds a local JSON index from published posts' titles, summaries, and rendered body text. The browser ranks matches and filters existing post cards, keeping queries in the URL for history and refresh. The index excludes drafts and uses no external search service. Interface translations live in `src/config/i18n.ts`; an inline TypeScript initializer applies the browser language or saved choice before display and before Astro swaps. Posts and tag names keep their authored text, without duplicate language routes.
 
 Astro uses `site` for the origin, `base` for `/blog/`, static output, directory-format pages and trailing slashes. Astro's ClientRouter enhances blog navigation with live glass-surface transitions while retaining every generated static page. The wallpaper and navigation bar persist between blog routes; RSS uses ordinary document navigation. See [Blog appearance](blog-appearance.md) for theme, wallpaper, and motion configuration.
+
+Blog pages and components own their markup and component-specific browser code.
+The header owns theme controls, docking and its selection pill; Background owns
+image loading; TableOfContents owns reading-position tracking; Locale owns its
+synchronous initializer; and Search owns its form events. Shared browser libraries
+handle glass, navigation and search preparation. Navigation prepares incoming
+search documents before animations even on the first client visit. Small reused
+modules, including GlassSurface, URL helpers and math macros, retain their semantic
+boundaries. Global CSS is split into ordered shared sheets without scoped selectors.
 
 Assets stay within each component's subtree. Authored images are colocated and processed by Astro. GitHub Pages has no general SPA rewrite service; future apps use static pages or hash routing.
 

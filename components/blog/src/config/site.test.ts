@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { blogUrl, absoluteUrl } from './site.mjs';
+import { blogUrl, absoluteUrl } from './site.ts';
 
 test('blog URLs encode logical segments and retain the blog base', () => {
   assert.equal(blogUrl(), '/blog/');

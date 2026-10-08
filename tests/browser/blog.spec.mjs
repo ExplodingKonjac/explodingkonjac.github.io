@@ -96,6 +96,16 @@ test('static routes, history, shell continuity and keyboard focus', async ({
   await expect(page.locator('.katex-display')).toHaveCount(2);
   await expect(page.locator('.environment-theorem')).toBeVisible();
   await expect(page.locator('.astro-code')).toHaveCount(1);
+  for (const heading of await page
+    .locator('.prose :is(h2, h3, h4, h5, h6)[id]')
+    .all()) {
+    const anchor = heading.locator(':scope > .heading-anchor');
+    await expect(anchor).toHaveAttribute(
+      'href',
+      `#${await heading.getAttribute('id')}`,
+    );
+    await expect(anchor).toHaveAttribute('aria-label', 'Link to this heading');
+  }
   await expect(page.locator('.prose table')).toHaveCount(1);
   await expect(page.locator('.prose figure img')).toHaveAttribute(
     'src',

@@ -7,11 +7,11 @@ import remarkMath from 'remark-math';
 import remarkRehype from 'remark-rehype';
 import rehypeKatex from 'rehype-katex';
 import rehypeStringify from 'rehype-stringify';
-import environments from './environments.mjs';
-import { mathMacros } from './math-macros.mjs';
+import environments from './environments.ts';
+import { mathMacros } from './math-macros.ts';
 import { postSchema } from '../lib/post-schema.ts';
 
-async function html(markdown) {
+async function html(markdown: string) {
   return String(
     await unified()
       .use(remarkParse)

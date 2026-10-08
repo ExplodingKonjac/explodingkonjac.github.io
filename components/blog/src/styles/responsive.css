@@ -1,0 +1,133 @@
+@media (max-width: 959px) {
+  .article-grid {
+    display: flex;
+    flex-direction: column;
+  }
+  .reading-card,
+  .toc {
+    width: 100%;
+  }
+  .toc {
+    position: relative;
+    top: auto;
+    padding: 0 24px;
+  }
+  .toc-desktop {
+    display: none;
+  }
+  .toc-mobile {
+    display: block;
+  }
+  .toc-mobile summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 62px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    list-style: none;
+  }
+  .toc-mobile summary::-webkit-details-marker {
+    display: none;
+  }
+  .toc-mobile summary span[aria-hidden] {
+    font-size: 20px;
+    font-weight: 400;
+  }
+  .toc-mobile[open] summary span[aria-hidden] {
+    transform: rotate(45deg);
+  }
+  .toc-mobile nav {
+    margin-bottom: 16px;
+    max-height: 45dvh;
+  }
+}
+@media (max-width: 600px) {
+  :root {
+    --radius: 22px;
+    --gap: 16px;
+    --blur: 2px;
+    --header-top: max(12px, env(safe-area-inset-top));
+  }
+  .shell {
+    width: calc(100% - 32px);
+    padding-bottom: 24px;
+  }
+  .wordmark {
+    justify-content: center;
+    font-size: 18px;
+    min-height: 40px;
+  }
+  .header-controls {
+    justify-content: space-between;
+    gap: 4px;
+  }
+  .site-header nav {
+    flex: 1;
+  }
+  .page-stage {
+    margin-top: 20px;
+  }
+  .page-heading {
+    padding: 30px 24px;
+  }
+  h1 {
+    font-size: clamp(32px, 8.3vw, 44px);
+    letter-spacing: -1.3px;
+  }
+  .page-heading > p {
+    font-size: 15px;
+    margin-top: 18px;
+  }
+  .post-card {
+    padding: 24px;
+  }
+  .post-list h2 {
+    font-size: 24px;
+    letter-spacing: -0.7px;
+  }
+  .post-link {
+    gap: 12px;
+  }
+  .post-card > .post-arrow {
+    right: 24px;
+    top: 20px;
+    font-size: 21px;
+  }
+  .post-card p {
+    font-size: 14px;
+  }
+  .tags {
+    gap: 0 4px;
+  }
+  .tags a {
+    padding: 0 10px;
+  }
+  .tag-index {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .tag-index a {
+    padding: 20px 24px;
+    min-height: 88px;
+  }
+  .reading-card {
+    padding: 24px 20px 28px;
+  }
+  .prose {
+    font-size: 16px;
+  }
+  .prose h2 {
+    font-size: 25px;
+  }
+  .environment {
+    padding: 16px;
+  }
+  .environment-figure {
+    padding: 0;
+  }
+  .prose pre {
+    padding: 16px;
+    font-size: 12px;
+  }
+}

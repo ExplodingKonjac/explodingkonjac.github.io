@@ -1,8 +1,11 @@
 ---
-import { background, assetUrl, fallbackBackground } from '../config/appearance';
+import { background, fallbackBackground } from '../config/appearance';
+import { blogUrl } from '../config/site.ts';
 const source = background.source;
 const initial =
-  source.kind === 'asset' ? assetUrl(source.src) : fallbackBackground;
+  source.kind === 'asset'
+    ? blogUrl(source.src.replace(/^\/+/, ''))
+    : fallbackBackground;
 const noScriptSource = source.kind === 'image' ? source.url : initial;
 ---
 
@@ -23,3 +26,88 @@ const noScriptSource = source.kind === 'image' ? source.url : initial;
   </noscript>
   <div class="wallpaper-scrim"></div>
 </div>
+
+<script>
+  import type { BackgroundConfig } from '../config/appearance';
+  function imageUrl(value: unknown, base: string): string {
+    if (typeof value !== 'string' || !value.trim())
+      throw new Error('Missing image URL');
+    const url = new URL(value, base);
+    if (!['https:', 'http:'].includes(url.protocol))
+      throw new Error('Unsupported image URL');
+    return url.href;
+  }
+
+  async function loadBackground() {
+    const wallpaper = document.querySelector<HTMLElement>('[data-background]');
+    if (!wallpaper || wallpaper.dataset.state) return;
+    wallpaper.dataset.state = 'loading';
+    const base = wallpaper.querySelector<HTMLImageElement>('.wallpaper-base')!;
+    const target =
+      wallpaper.querySelector<HTMLImageElement>('.wallpaper-image')!;
+    const fallback = wallpaper.dataset.fallback!;
+    const restoreLocal = () => {
+      if (base.getAttribute('src') !== fallback) base.src = fallback;
+    };
+    base.addEventListener('error', restoreLocal);
+    if (base.complete && !base.naturalWidth) restoreLocal();
+    const controller = new AbortController();
+    let deadline: ReturnType<typeof setTimeout> | undefined;
+    try {
+      const config: BackgroundConfig = JSON.parse(
+        wallpaper.dataset.background!,
+      );
+      if (config.source.kind === 'asset') {
+        wallpaper.dataset.state = 'ready';
+        return;
+      }
+      const source = config.source;
+      const timeout = new Promise<never>((_, reject) => {
+        deadline = setTimeout(() => {
+          controller.abort();
+          reject(new Error('Background loading deadline exceeded'));
+        }, 8000);
+      });
+      const load = async () => {
+        let url: string;
+        if (source.kind === 'json') {
+          const endpoint = imageUrl(source.url, location.href);
+          const response = await fetch(endpoint, {
+            signal: controller.signal,
+            credentials: 'omit',
+          });
+          if (!response.ok) throw new Error('Image API failed');
+          let value: unknown = await response.json();
+          for (const key of source.imagePath.split('.')) {
+            if (
+              !key ||
+              !value ||
+              typeof value !== 'object' ||
+              !Object.hasOwn(value, key)
+            )
+              throw new Error('Missing image field');
+            value = (value as Record<string, unknown>)[key];
+          }
+          url = imageUrl(value, response.url || endpoint);
+        } else {
+          url = imageUrl(source.url, location.href);
+        }
+        if (controller.signal.aborted)
+          throw new Error('Background request cancelled');
+        target.src = url;
+        await target.decode();
+      };
+      await Promise.race([load(), timeout]);
+      target.classList.add('is-loaded');
+      wallpaper.dataset.state = 'ready';
+    } catch {
+      controller.abort();
+      target.removeAttribute('src');
+      wallpaper.dataset.state = 'fallback';
+    } finally {
+      if (deadline) clearTimeout(deadline);
+    }
+  }
+
+  void loadBackground();
+</script>

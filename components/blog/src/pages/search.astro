@@ -3,7 +3,7 @@ import Base from '../layouts/Base.astro';
 import GlassSurface from '../components/GlassSurface.astro';
 import PostList from '../components/PostList.astro';
 import { publishedPosts } from '../lib/posts';
-import { blogUrl } from '../config/site.mjs';
+import { blogUrl } from '../config/site.ts';
 const posts = (await publishedPosts()).filter((post) => !post.data.draft);
 ---
 
@@ -100,3 +100,111 @@ const posts = (await publishedPosts()).filter((post) => !post.data.draft);
     </style>
   </noscript>
 </Base>
+
+<script>
+  import { blogUrl } from '../config/site.ts';
+  import {
+    loadSearchIndex,
+    setSearchStatus,
+    renderSearch,
+    prepareSearch,
+  } from '../lib/search-ui';
+  import { prepareGlass } from '../lib/glass';
+  let controller: AbortController | undefined;
+  let currentRoot: HTMLElement | null = null;
+  function initialize() {
+    const root = document.querySelector<HTMLElement>('[data-search]');
+    if (root === currentRoot && controller && !controller.signal.aborted)
+      return;
+    controller?.abort();
+    currentRoot = root;
+    if (!root) return;
+    const page = new AbortController();
+    controller = page;
+    const { signal } = page;
+    prepareSearch(document, new URL(location.href));
+    const input = root.querySelector<HTMLInputElement>('input[name="q"]')!;
+    const form = root.querySelector('form')!;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    let composing = false;
+    const update = async (save = true) => {
+      clearTimeout(timer);
+      const query = input.value;
+      if (save) {
+        const url = new URL(location.href);
+        if (query) url.searchParams.set('q', query);
+        else url.searchParams.delete('q');
+        history.replaceState(history.state, '', url);
+      }
+      renderSearch(root, query);
+      if (query.trim()) {
+        try {
+          await loadSearchIndex();
+        } catch {
+          if (!signal.aborted && input.value === query)
+            setSearchStatus(root, 'search.error');
+          return;
+        }
+      }
+      if (signal.aborted || !root.isConnected || input.value !== query) return;
+      renderSearch(root, query);
+      prepareGlass(root);
+    };
+    input.addEventListener(
+      'input',
+      (event) => {
+        if (composing || (event as InputEvent).isComposing) return;
+        clearTimeout(timer);
+        timer = setTimeout(() => void update(), 100);
+      },
+      { signal },
+    );
+    input.addEventListener(
+      'compositionstart',
+      () => {
+        composing = true;
+        clearTimeout(timer);
+      },
+      { signal },
+    );
+    input.addEventListener(
+      'compositionend',
+      () => {
+        composing = false;
+        void update();
+      },
+      { signal },
+    );
+    form.addEventListener(
+      'submit',
+      (event) => {
+        event.preventDefault();
+        if (!composing) void update();
+      },
+      { signal },
+    );
+    form.addEventListener(
+      'reset',
+      (event) => {
+        event.preventDefault();
+        input.value = '';
+        void update();
+        input.focus();
+      },
+      { signal },
+    );
+    window.addEventListener(
+      'popstate',
+      () => {
+        if (location.pathname !== blogUrl('search')) return;
+        prepareSearch(document, new URL(location.href));
+        void update(false);
+      },
+      { signal },
+    );
+    signal.addEventListener('abort', () => clearTimeout(timer), { once: true });
+    void update(false);
+  }
+  document.addEventListener('astro:page-load', initialize);
+  initialize();
+</script>

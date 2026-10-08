@@ -20,7 +20,7 @@ Run `pnpm dev` to build and serve the complete static site. After edits, run `pn
 
 ## Math and environments
 
-Use `$x \in \RR$` inline and separate `$$` blocks for display math. Shared macros are in `src/plugins/math-macros.mjs`: `\RR`, `\NN`, `\ZZ`, and `\QQ` are provided. Math renders at build time; fix invalid math detected by verification before publishing.
+Use `$x \in \RR$` inline and separate `$$` blocks for display math. Shared macros are in `src/plugins/math-macros.ts`: `\RR`, `\NN`, `\ZZ`, and `\QQ` are provided. Math renders at build time; fix invalid math detected by verification before publishing.
 
 ```markdown
 :::theorem[Pythagorean theorem]{#pythagoras}

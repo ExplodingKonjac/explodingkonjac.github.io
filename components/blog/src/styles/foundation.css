@@ -1,0 +1,203 @@
+:root {
+  color-scheme: light;
+  --ink: #202d45;
+  --muted: #324058;
+  --accent: #20406a;
+  --line: rgb(63 85 121 / 15%);
+  --inset: rgb(137 157 190 / 11%);
+  /* Glass fill opacity: lower the percentage for more transparency. */
+  --glass: rgb(247 250 255 / 50%);
+  --clear-glass: rgb(243 248 255 / 25%);
+  --reading-glass: rgb(249 251 255 / 75%);
+  --opaque: #f1f5fc;
+  --rim: rgb(255 255 255 / 62%);
+  --rim-shade: rgb(111 134 177 / 22%);
+  --shine: rgb(255 255 255 / 12%);
+  --shadow:
+    0 12px 36px -12px rgb(49 70 116 / 17%), 0 2px 6px rgb(49 70 116 / 3%);
+  --scrim: rgb(228 236 248 / 26%);
+  --active: rgb(255 255 255 / 68%);
+  /* Controls share the cards' translucent tint and a single illuminated rim. */
+  --control-fill: rgb(247 251 255 / 24%);
+  --control-hover: rgb(255 255 255 / 38%);
+  --control-border: rgb(83 106 143 / 22%);
+  --control-highlight: rgb(255 255 255 / 60%);
+  --control-shadow: 0 3px 10px -5px rgb(36 54 89 / 16%);
+  --warning: #935123;
+  --radius: 28px;
+  --blur: 8px;
+  /* Blur eases from 25% at the rim to full strength across this distance. */
+  --blur-edge-ratio: 0.25;
+  --blur-ramp: 64px;
+  /* Refraction geometry stays independent of the blur gradient. */
+  --refraction-strength: 32;
+  --refraction-width: 18px;
+  --gap: 24px;
+  --header-height: 76px;
+  --header-top: max(20px, env(safe-area-inset-top));
+  --anchor-offset: calc(var(--header-height) + var(--header-top) + 20px);
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: #e3eaf5;
+  color: var(--ink);
+  font-synthesis: none;
+  -webkit-font-smoothing: antialiased;
+}
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --ink: #edf2fc;
+  --muted: #c0cce0;
+  --accent: #a8c9ff;
+  --line: rgb(198 216 248 / 16%);
+  --inset: rgb(154 184 232 / 9%);
+  --glass: rgb(22 32 52 / 50%);
+  --clear-glass: rgb(27 39 62 / 25%);
+  --reading-glass: rgb(20 29 47 / 75%);
+  --opaque: #1c2940;
+  --rim: rgb(207 224 255 / 25%);
+  --rim-shade: rgb(6 13 28 / 45%);
+  --shine: rgb(196 215 255 / 7%);
+  --shadow: 0 16px 44px -12px rgb(4 10 25 / 35%), 0 2px 8px rgb(4 10 25 / 8%);
+  --scrim: rgb(10 18 38 / 60%);
+  --active: rgb(175 202 244 / 14%);
+  --control-fill: rgb(112 144 196 / 14%);
+  --control-hover: rgb(150 180 224 / 24%);
+  --control-border: rgb(190 213 249 / 24%);
+  --control-highlight: rgb(223 237 255 / 36%);
+  --control-shadow: 0 3px 10px -5px rgb(3 9 21 / 28%);
+  --warning: #f1bd94;
+  background: #141d30;
+}
+/* System theme when scripts are unavailable. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    color-scheme: dark;
+    --ink: #edf2fc;
+    --muted: #c0cce0;
+    --accent: #a8c9ff;
+    --line: rgb(198 216 248 / 16%);
+    --inset: rgb(154 184 232 / 9%);
+    --glass: rgb(22 32 52 / 30%);
+    --clear-glass: rgb(27 39 62 / 20%);
+    --reading-glass: rgb(20 29 47 / 62%);
+    --opaque: #1c2940;
+    --rim: rgb(207 224 255 / 25%);
+    --rim-shade: rgb(6 13 28 / 45%);
+    --shine: rgb(196 215 255 / 7%);
+    --shadow: 0 16px 44px -12px rgb(4 10 25 / 35%);
+    --scrim: rgb(10 18 38 / 60%);
+    --active: rgb(175 202 244 / 14%);
+    --control-fill: rgb(112 144 196 / 14%);
+    --control-hover: rgb(150 180 224 / 24%);
+    --control-border: rgb(190 213 249 / 24%);
+    --control-highlight: rgb(223 237 255 / 36%);
+    --control-shadow: 0 3px 10px -5px rgb(3 9 21 / 28%);
+    --warning: #f1bd94;
+    background: #141d30;
+  }
+}
+* {
+  box-sizing: border-box;
+}
+html {
+  scroll-padding-top: var(--anchor-offset);
+  scrollbar-gutter: stable;
+}
+body {
+  margin: 0;
+  line-height: 1.7;
+  min-width: 280px;
+}
+button,
+summary,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+button {
+  font: inherit;
+}
+[hidden] {
+  display: none !important;
+}
+a {
+  color: var(--accent);
+  text-underline-offset: 4px;
+  text-decoration-thickness: 1px;
+}
+a:hover {
+  text-decoration-thickness: 2px;
+}
+:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 5px;
+  border-radius: 4px;
+}
+::selection {
+  background: rgb(96 146 223 / 25%);
+}
+.wallpaper {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+  background: linear-gradient(140deg, #e3edf8, #b9c8e9 55%, #dad4ed);
+}
+.wallpaper img {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  inset: 0;
+  object-fit: cover;
+  object-position: var(--wallpaper-position, 50% 50%);
+}
+.wallpaper-image {
+  opacity: 0;
+  transition: opacity 240ms ease;
+}
+.wallpaper-image.is-loaded {
+  opacity: 1;
+}
+.wallpaper-scrim {
+  position: absolute;
+  inset: 0;
+  background: var(--scrim);
+}
+.shell {
+  width: min(1120px, calc(100% - 64px));
+  margin: 0 auto;
+  padding-top: var(--header-top);
+  padding-bottom: max(32px, env(safe-area-inset-bottom));
+}
+.glass {
+  position: relative;
+  border-radius: var(--radius);
+}
+.glass-surface {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background:
+    linear-gradient(145deg, var(--shine), transparent 42%), var(--glass);
+  border: 1px solid var(--rim);
+  border-bottom-color: var(--rim-shade);
+  border-right-color: var(--rim-shade);
+  /* One continuous rim follows the lens boundary, without a second inset outline. */
+  box-shadow: var(--shadow);
+  -webkit-backdrop-filter: blur(var(--blur)) saturate(135%);
+  backdrop-filter: blur(var(--blur)) saturate(135%);
+}
+.glass-surface[data-refractive] {
+  /* A lightly blurred base graduates to center frost before refraction. */
+  backdrop-filter: blur(var(--blur-base, var(--blur))) var(--refraction)
+    saturate(135%);
+}
+.glass > :not(.glass-surface) {
+  position: relative;
+}
+.glass-clear {
+  --glass: var(--clear-glass);
+}
+.glass-reading {
+  --glass: var(--reading-glass);
+}

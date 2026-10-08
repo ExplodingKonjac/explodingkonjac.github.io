@@ -34,3 +34,55 @@ const { headings } = Astro.props;
     </nav>
   </details>
 </aside>
+
+<script>
+  const header = document.querySelector<HTMLElement>('.site-header');
+  let pageController: AbortController | undefined;
+  function initializeContents() {
+    pageController?.abort();
+    pageController = new AbortController();
+    const headings = [
+      ...document.querySelectorAll<HTMLElement>('.prose h2[id], .prose h3[id]'),
+    ];
+    const links = [...document.querySelectorAll<HTMLAnchorElement>('.toc a')];
+    let frame = 0;
+    let current = '';
+    const update = () => {
+      frame = 0;
+      const offset = (header?.getBoundingClientRect().bottom ?? 0) + 64;
+      const active = headings.findLast(
+        (heading) => heading.getBoundingClientRect().top <= offset,
+      );
+      const id = active?.id ?? '';
+      if (current === id) return;
+      current = id;
+      links.forEach((link) => {
+        if (decodeURIComponent(link.hash.slice(1)) === id)
+          link.setAttribute('aria-current', 'location');
+        else link.removeAttribute('aria-current');
+      });
+    };
+    const schedule = () => {
+      if (!frame) frame = requestAnimationFrame(update);
+    };
+    if (headings.length) {
+      window.addEventListener('scroll', schedule, {
+        passive: true,
+        signal: pageController.signal,
+      });
+      window.addEventListener('resize', schedule, {
+        passive: true,
+        signal: pageController.signal,
+      });
+      pageController.signal.addEventListener(
+        'abort',
+        () => cancelAnimationFrame(frame),
+        { once: true },
+      );
+      update();
+    }
+  }
+  document.addEventListener('astro:before-swap', () => pageController?.abort());
+  document.addEventListener('astro:page-load', initializeContents);
+  initializeContents();
+</script>

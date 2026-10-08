@@ -1,4 +1,4 @@
-import { site as blog } from '../components/blog/src/config/site.mjs';
+import { site as blog } from '../components/blog/src/config/site.ts';
 
 // Deployment inputs only. Components own their content and framework settings.
 // Titles label the recovery links on the root 404 page.

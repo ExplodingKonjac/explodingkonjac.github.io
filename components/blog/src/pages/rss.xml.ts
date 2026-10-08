@@ -1,5 +1,5 @@
 import rss from '@astrojs/rss';
-import { site, absoluteUrl, blogUrl } from '../config/site.mjs';
+import { site, absoluteUrl, blogUrl } from '../config/site.ts';
 import { publishedPosts, postUrl } from '../lib/posts';
 
 export async function GET() {

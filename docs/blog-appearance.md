@@ -59,7 +59,7 @@ the fallback. Keep the bundled `backgrounds/aurora.svg` available as the fallbac
 ## Themes and materials
 
 The navbar's shared pill selects Blog, Tags, or Search. Separate round GitHub,
-theme, and language buttons sit beside it. Set `github` in `src/config/site.mjs`
+theme, and language buttons sit beside it. Set `github` in `src/config/site.ts`
 to change the new-tab profile link. The RSS feed and its autodiscovery link remain
 available, though RSS is no longer a navbar item.
 
@@ -69,7 +69,7 @@ choice is saved in `blog-ui-language`; removing it restores browser-language
 following. Blocked storage retains the choice for the current document session.
 Labels, accessibility text, dates, search messages, and fixed page metadata switch
 together. Authored titles, summaries, bodies, headings, and tag names are unchanged.
-The inline initializer in `src/scripts/locale.ts` runs before visible translated
+The inline initializer in `src/components/Locale.astro` runs before visible translated
 text and on incoming documents. Without JavaScript, the interface remains English.
 
 Search matches words across titles, summaries, and rendered body text, including
@@ -87,24 +87,27 @@ that key restores system following. If storage is unavailable, the choice surviv
 client navigation in memory. The first-paint script and Astro's before-swap hook
 apply the theme before a page appears.
 
-Material, color, spacing, and type tokens are in `src/styles/global.css`. `.glass`
+Shared styles are imported through `src/styles/global.css` in their cascade
+order: motion, foundation, UI/layout, content, responsive, then overrides.
+Material, color, spacing, and type tokens are in `src/styles/foundation.css`. `.glass`
 contains a decorative `GlassSurface`; `.glass-clear` is used for navigation and the
 ToC, and `.glass-reading` keeps a denser film for article legibility. The other
 surfaces deliberately let substantially more wallpaper show through.
 
 To adjust glass opacity, edit the percentage after `/` in these color tokens in
-`components/blog/src/styles/global.css`:
+`components/blog/src/styles/foundation.css`:
 
-| Token             | Surfaces                               | Light | Dark |
-| ----------------- | -------------------------------------- | ----- | ---- |
-| `--glass`         | Headings, summaries, tag tiles, footer | 30%   | 30%  |
-| `--clear-glass`   | Navbar and table of contents           | 20%   | 20%  |
-| `--reading-glass` | Article body                           | 75%   | 75%  |
+| Token             | Surfaces                       | Light | Dark |
+| ----------------- | ------------------------------ | ----- | ---- |
+| `--glass`         | Headings, summaries, tag tiles | 50%   | 50%  |
+| `--clear-glass`   | Navbar and table of contents   | 25%   | 25%  |
+| `--reading-glass` | Article body                   | 75%   | 75%  |
 
 Lower percentages make the fill more transparent. Light values live in `:root`;
 dark values live in `:root[data-theme='dark']` and are repeated in the
 `prefers-color-scheme: dark` block for visitors without JavaScript. Keep those two
-dark blocks in sync. Change the color alpha rather than the element's `opacity`,
+dark blocks consistent with the intended fallback: without JavaScript, dark-mode
+glass uses 30%, clear glass 20%, and reading glass 62%. Change the color alpha rather than the element's `opacity`,
 which would also fade text and alter backdrop compositing. `--shine` controls the
 subtle surface highlight and `--scrim` controls the wallpaper overlay independently.
 Rebuild to see configuration and stylesheet changes in the production preview.
@@ -116,16 +119,15 @@ and faint ambient shadow keep them consistent with the larger glass surfaces.
 Pressing a control softens the rim and adds a subtle inset shade without moving
 its hit target. Tag links retain 44px hit areas.
 
-Selection groups use one shared glass pill, which slides to the hovered or
-keyboard-focused item over 280ms and returns to the active item when interaction
-leaves the group. The navbar keeps the same pill across routes and continuously
-aligns it while docking or resizing. Reduced motion moves it immediately; without
-JavaScript, the active link keeps its static glass treatment. To reuse this
-behavior, mark a group with `data-pill-group`, mark its controls with
-`data-pill-item`, and set their active state with `aria-current`, `aria-selected`,
-or `aria-pressed`. Behavior lives in `src/scripts/selection-pill.ts`.
+The navbar uses one shared glass pill, which slides to the hovered or
+keyboard-focused item over 280ms and returns to the active link when interaction
+leaves the group. It keeps the same pill across routes and continuously aligns
+while docking or resizing. Reduced motion moves it immediately; without
+JavaScript, the active link keeps its static glass treatment. The header owns
+this behavior in `src/components/SiteHeader.astro`; `aria-current` identifies the
+active route.
 
-`src/scripts/glass.ts` generates a rounded-rectangle displacement map for each
+`src/lib/glass.ts` generates a rounded-rectangle displacement map for each
 surface. In Chromium, an SVG backdrop filter bends background pixels within an
 18px edge band. Blur rises continuously from a lightly diffused rim to the full
 center setting, using a smooth distance mask that follows the rounded outline.
@@ -136,7 +138,7 @@ blends the blur levels before refraction; the tint and border stay continuous.
 Foreground text is outside the filter. Maps follow resized cards and the navbar's
 changing corner radius, and filters are reclaimed after navigation.
 
-These tokens in `src/styles/global.css` control the optics independently of opacity:
+These tokens in `src/styles/foundation.css` control the optics independently of opacity:
 
 - `--blur: 8px` controls the maximum center blur (mobile overrides it to `2px`,
   navbar to `8px`). It does not change refraction strength.
@@ -202,7 +204,7 @@ crossfade at their final typography to avoid line-break jumps. Keyboard focus
 waits for the real heading to replace the moving label; reduced motion skips the
 flight, and interrupted navigation removes all temporary layers.
 
-`src/scripts/navbar.ts` maps the first 120px of scroll to a continuous dock progress.
+`src/components/SiteHeader.astro` maps the first 120px of scroll to a continuous dock progress.
 The floating panel widens to the viewport, reaches the top edge and straightens
 its corners without replacing the element or changing its blur or tint. Its top,
 left, and right rim highlights and refraction fade with the docking progress.
@@ -217,8 +219,10 @@ anchor offsets follow its actual dimensions.
 At the top, the panel aligns with the current page's centered content shell;
 its measurements are refreshed from the new shell after each Astro swap.
 
-Motion behavior lives in `src/scripts/navigation.ts`; `src/styles/motion.css`
-contains its layer and visibility rules. RSS, external links, modified clicks,
+Motion behavior lives in `src/lib/navigation.ts`; `src/styles/motion.css`
+contains its layer and visibility rules. Animation and reveal helpers live in
+`src/lib/navigation-motion.ts`, and shared-card flights in
+`src/lib/navigation-flight.ts`. RSS, external links, modified clicks,
 and no-JavaScript navigation retain ordinary browser behavior.
 
 ## Verification

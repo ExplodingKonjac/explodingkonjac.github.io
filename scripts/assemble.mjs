@@ -3,7 +3,7 @@ import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { components } from './components.mjs';
 import { site } from '../components/home/site.mjs';
-import { absoluteUrl, blogUrl } from '../components/blog/src/config/site.mjs';
+import { absoluteUrl, blogUrl } from '../components/blog/src/config/site.ts';
 
 export const repoRoot = fileURLToPath(new URL('../', import.meta.url));
 

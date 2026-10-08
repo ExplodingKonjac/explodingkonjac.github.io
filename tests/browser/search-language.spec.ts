@@ -100,6 +100,43 @@ test('search matches titles, summaries and contents, restores the query on Back 
   expect(errors).toEqual([]);
 });
 
+test('first client arrival prepares a bookmarked query before swapping and reuses its index', async ({
+  page,
+}) => {
+  let requests = 0;
+  page.on('request', (request) => {
+    if (request.url().endsWith('/search-index.json')) requests++;
+  });
+  await page.goto('/blog/');
+  await page.locator('[data-nav="search"]').evaluate((link) => {
+    link.setAttribute('href', '/blog/search/?q=hypotenuse');
+  });
+  await page.evaluate(() => {
+    document.addEventListener('astro:before-swap', (event) => {
+      const input = (
+        event as Event & { newDocument: Document }
+      ).newDocument.querySelector<HTMLInputElement>('input[name="q"]');
+      if (input) input.dataset.preparedQuery = input.value;
+    });
+  });
+  await page.locator('[data-nav="search"]').click();
+  const input = page.getByRole('searchbox');
+  await expect(input).toHaveAttribute('data-prepared-query', 'hypotenuse');
+  for (let visit = 0; visit < 3; visit++) {
+    await settle(page);
+    await expect(input).toHaveValue('hypotenuse');
+    await expect(page.locator('.post-card:visible')).toHaveCount(1);
+    await page.locator('.post-link').click();
+    await expect(page).toHaveURL(post);
+    await settle(page);
+    await page.goBack();
+    await expect(page).toHaveURL(/search\/\?q=hypotenuse/);
+  }
+  await settle(page);
+  await expect(input).toHaveValue('hypotenuse');
+  expect(requests).toBe(1);
+});
+
 test('search waits for IME composition and can retry a failed index request', async ({
   page,
 }) => {

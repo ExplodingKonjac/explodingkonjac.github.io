@@ -90,7 +90,7 @@ function displacement(
   return canvas.toDataURL();
 }
 
-function update(surface: HTMLElement) {
+export function refreshGlass(surface: HTMLElement) {
   if (!supportsRefraction || !surface.isConnected) return;
   const rect = surface.getBoundingClientRect();
   if (rect.width < 1 || rect.height < 1) return;
@@ -193,7 +193,7 @@ function update(surface: HTMLElement) {
   surface.dataset.refractive = '';
 }
 const observer = new ResizeObserver((entries) => {
-  for (const entry of entries) update(entry.target as HTMLElement);
+  for (const entry of entries) refreshGlass(entry.target as HTMLElement);
 });
 
 export function prepareGlass(root: ParentNode = document) {
@@ -206,14 +206,8 @@ export function prepareGlass(root: ParentNode = document) {
   }
   root.querySelectorAll<HTMLElement>('.glass-surface').forEach((surface) => {
     if (supportsRefraction) {
-      update(surface);
+      refreshGlass(surface);
       observer.observe(surface);
     }
   });
 }
-
-// Radius changes during the navbar reshape even when its dimensions round equally.
-export function refreshGlass(surface: HTMLElement) {
-  update(surface);
-}
-prepareGlass();

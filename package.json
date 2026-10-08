@@ -13,7 +13,7 @@
     "assemble": "node scripts/assemble.mjs",
     "preview": "node scripts/preview.mjs",
     "verify": "node scripts/verify-site.mjs",
-    "test": "node --test scripts/*.test.mjs components/blog/src/plugins/*.test.mjs components/blog/src/config/*.test.mjs components/blog/src/lib/*.test.ts",
+    "test": "node --test scripts/*.test.mjs components/blog/src/plugins/*.test.ts components/blog/src/config/*.test.ts components/blog/src/lib/*.test.ts",
     "test:browser": "playwright test",
     "format": "prettier --write .",
     "format:check": "prettier --check ."

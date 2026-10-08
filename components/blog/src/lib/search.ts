@@ -4,7 +4,7 @@ export interface SearchEntry {
   summary: string;
   content: string;
 }
-export function normalizeSearch(text: string) {
+function normalizeSearch(text: string) {
   return text.normalize('NFKD').replace(/\p{M}/gu, '').toLowerCase();
 }
 export function searchPosts(entries: SearchEntry[], query: string) {

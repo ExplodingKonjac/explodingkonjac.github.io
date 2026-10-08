@@ -1,0 +1,393 @@
+---
+import { blogUrl, site } from '../config/site.ts';
+import GlassSurface from './GlassSurface.astro';
+const tagsActive = Astro.url.pathname.startsWith(blogUrl('tags'));
+const searchActive = Astro.url.pathname.startsWith(blogUrl('search'));
+---
+
+<div class="header-slot">
+  <header
+    class="site-header glass glass-clear"
+    transition:name="blog-header"
+    transition:persist="blog-header"
+    transition:animate="none"
+  >
+    <GlassSurface />
+    <div class="header-inner">
+      <a href={blogUrl()} class="wordmark">
+        {site.name}
+        <span aria-hidden="true">.</span>
+      </a>
+      <div class="header-controls">
+        <nav
+          aria-label="Main navigation"
+          data-i18n-aria="nav.main"
+          data-pill-group
+        >
+          <a
+            href={blogUrl()}
+            data-nav="blog"
+            data-pill-item
+            aria-current={!tagsActive && !searchActive ? 'page' : undefined}
+            data-i18n="nav.blog"
+          >
+            Blog
+          </a>
+          <a
+            href={blogUrl('tags')}
+            data-nav="tags"
+            data-pill-item
+            aria-current={tagsActive ? 'page' : undefined}
+            data-i18n="nav.tags"
+          >
+            Tags
+          </a>
+          <a
+            href={blogUrl('search')}
+            data-nav="search"
+            data-pill-item
+            data-i18n="nav.search"
+            aria-current={searchActive ? 'page' : undefined}
+          >
+            Search
+          </a>
+        </nav>
+        <div class="header-tools">
+          <a
+            class="icon-button github-link"
+            href={site.github}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="GitHub (opens in a new tab)"
+            data-i18n-aria="nav.github"
+          >
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" />
+            </svg>
+          </a>
+          <button
+            class="icon-button theme-toggle"
+            type="button"
+            aria-label="Switch to dark mode"
+            hidden
+          >
+            <svg
+              class="icon-sun"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.6"
+              aria-hidden="true"
+            >
+              <circle cx="12" cy="12" r="4" />
+              <path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42" />
+            </svg>
+            <svg
+              class="icon-moon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.6"
+              aria-hidden="true"
+            >
+              <path d="M20.5 13.5A8.8 8.8 0 0 1 10.5 3.5 8.8 8.8 0 1 0 20.5 13.5Z" />
+            </svg>
+          </button>
+          <button
+            class="icon-button language-toggle"
+            type="button"
+            aria-label="Language: English. Switch to 简体中文"
+            hidden
+          >
+            <span aria-hidden="true">EN</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+</div>
+
+<script>
+  import { blogUrl } from '../config/site.ts';
+  import { themeStorageKey } from '../config/appearance';
+  import type { TransitionBeforeSwapEvent } from 'astro:transitions/client';
+  import { refreshGlass } from '../lib/glass';
+  type Theme = 'light' | 'dark';
+  const systemTheme = matchMedia('(prefers-color-scheme: dark)');
+  let preference: Theme | undefined;
+  try {
+    const stored = localStorage.getItem(themeStorageKey);
+    if (stored === 'light' || stored === 'dark') preference = stored;
+  } catch {
+    /* A private browsing session can still keep an in-memory choice. */
+  }
+
+  function applyTheme(doc: Document = document) {
+    const theme = preference ?? (systemTheme.matches ? 'dark' : 'light');
+    doc.documentElement.dataset.theme = theme;
+    doc
+      .querySelector('meta[name="theme-color"]')
+      ?.setAttribute('content', theme === 'dark' ? '#141d30' : '#e3eaf5');
+    const button = doc.querySelector<HTMLButtonElement>('.theme-toggle');
+    if (button) {
+      button.hidden = false;
+      button.setAttribute(
+        'aria-label',
+        window.__blogLocale?.text(
+          theme === 'dark' ? 'theme.light' : 'theme.dark',
+        ) ?? `Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`,
+      );
+      button.title = button.getAttribute('aria-label')!;
+    }
+  }
+
+  document.addEventListener('click', (event) => {
+    if (
+      !(event.target instanceof Element) ||
+      !event.target.closest('.theme-toggle')
+    )
+      return;
+    preference =
+      document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+    try {
+      localStorage.setItem(themeStorageKey, preference);
+    } catch {
+      /* Keep the in-memory preference. */
+    }
+    applyTheme();
+  });
+  systemTheme.addEventListener('change', () => {
+    if (!preference) applyTheme();
+  });
+  window.addEventListener('storage', (event) => {
+    if (event.key !== themeStorageKey && event.key !== null) return;
+    preference =
+      event.newValue === 'light' || event.newValue === 'dark'
+        ? event.newValue
+        : undefined;
+    applyTheme();
+  });
+  document.addEventListener(
+    'astro:before-swap',
+    (event: TransitionBeforeSwapEvent) => {
+      applyTheme(event.newDocument);
+      event.newDocument.documentElement.dataset.themeReady = '';
+    },
+  );
+
+  const header = document.querySelector<HTMLElement>('.site-header')!;
+  const surface = header.querySelector<HTMLElement>('.glass-surface')!;
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+  let progress = Math.min(1, Math.max(0, scrollY / 120));
+  let frame = 0;
+  let routeAnimation = 0;
+  const smooth = (t: number) => t * t * (3 - 2 * t);
+
+  function paint(value: number) {
+    progress = value;
+    // Astro persists the header, but replaces its surrounding layout on every route.
+    // A cached shell would be detached and report zero-sized bounds after a swap.
+    const bounds = document
+      .querySelector<HTMLElement>('.shell')!
+      .getBoundingClientRect();
+    const mobile = innerWidth <= 600;
+    const style = getComputedStyle(header);
+    const floatingHeight = parseFloat(
+      style.getPropertyValue('--nav-floating-height'),
+    );
+    const dockedHeight = parseFloat(
+      style.getPropertyValue('--nav-docked-height'),
+    );
+    const height = floatingHeight + (dockedHeight - floatingHeight) * value;
+    const top =
+      parseFloat(
+        getComputedStyle(document.querySelector('.header-slot')!).top,
+      ) || (mobile ? 12 : 20);
+    const width = document.documentElement.clientWidth;
+    header.dataset.navReady = '';
+    header.dataset.docked = value >= 0.999 ? 'true' : 'false';
+    header.style.left = `${bounds.left * (1 - value)}px`;
+    header.style.width = `${bounds.width + (width - bounds.width) * value}px`;
+    header.style.top = `${top * (1 - value)}px`;
+    header.style.height = `${height}px`;
+    header.style.borderRadius = `${(mobile ? 22 : 28) * (1 - value)}px`;
+    header.style.setProperty('--nav-progress', String(value));
+    document.documentElement.style.setProperty(
+      '--anchor-offset',
+      `${top * (1 - value) + height + 20}px`,
+    );
+    document.documentElement.style.setProperty(
+      '--header-height',
+      `${height}px`,
+    );
+    refreshGlass(surface);
+  }
+  function schedule() {
+    if (frame || routeAnimation) return;
+    frame = requestAnimationFrame(() => {
+      frame = 0;
+      paint(smooth(Math.min(1, Math.max(0, scrollY / 120))));
+    });
+  }
+  window.addEventListener('scroll', schedule, { passive: true });
+  window.addEventListener('resize', schedule, { passive: true });
+  document.addEventListener('blog:language-change', schedule);
+  const resumeScroll = () => {
+    cancelAnimationFrame(routeAnimation);
+    routeAnimation = 0;
+    schedule();
+  };
+  window.addEventListener('wheel', resumeScroll, { passive: true });
+  window.addEventListener('touchstart', resumeScroll, { passive: true });
+
+  document.addEventListener('astro:after-swap', () => {
+    cancelAnimationFrame(frame);
+    frame = 0;
+    cancelAnimationFrame(routeAnimation);
+    const from = progress;
+    const to = smooth(Math.min(1, Math.max(0, scrollY / 120)));
+    if (reduced.matches || Math.abs(from - to) < 0.001) {
+      routeAnimation = 0;
+      paint(to);
+      return;
+    }
+    const start = performance.now();
+    const tick = (now: number) => {
+      const t = Math.min(1, (now - start) / 360);
+      paint(from + (to - from) * (1 - (1 - t) ** 3));
+      routeAnimation = t < 1 ? requestAnimationFrame(tick) : 0;
+    };
+    routeAnimation = requestAnimationFrame(tick);
+  });
+  paint(progress);
+
+  const duration = 280;
+  function initializePill(group: HTMLElement) {
+    const items = [...group.querySelectorAll<HTMLElement>('[data-pill-item]')];
+    if (!items.length) return;
+    const pill = document.createElement('span');
+    pill.className = 'selection-pill';
+    pill.setAttribute('aria-hidden', 'true');
+    group.prepend(pill);
+    let hovered: HTMLElement | undefined;
+    let target: HTMLElement | undefined;
+    let frame = 0;
+    let started = 0;
+    let origin = new Map<HTMLElement, number>();
+    let current = new Map<HTMLElement, number>();
+
+    // Interpolate item bounds, not stale pixel endpoints: the navbar can reshape
+    // while the pill travels, and rapid pointer changes continue from its position.
+    function weights(now: number) {
+      if (!target) return new Map<HTMLElement, number>();
+      const progress = reduced.matches
+        ? 1
+        : Math.min(1, (now - started) / duration);
+      const mix = 1 - (1 - progress) ** 3;
+      const result = new Map(
+        [...origin].map(([item, value]) => [item, value * (1 - mix)]),
+      );
+      result.set(target, (result.get(target) ?? 0) + mix);
+      return result;
+    }
+    function paint(now: number) {
+      frame = 0;
+      const bounds = group.getBoundingClientRect();
+      let x = 0,
+        y = 0,
+        width = 0,
+        height = 0;
+      current = weights(now);
+      for (const [item, weight] of current) {
+        if (!weight) continue;
+        const rect = item.getBoundingClientRect();
+        x +=
+          (rect.left - bounds.left - group.clientLeft + group.scrollLeft) *
+          weight;
+        y +=
+          (rect.top - bounds.top - group.clientTop + group.scrollTop) * weight;
+        width += rect.width * weight;
+        height += rect.height * weight;
+      }
+      pill.style.transform = `translate(${x}px, ${y}px)`;
+      pill.style.width = `${width}px`;
+      pill.style.height = `${height}px`;
+      if (!reduced.matches && now - started < duration) schedule();
+    }
+    function schedule() {
+      if (!frame) frame = requestAnimationFrame(paint);
+    }
+    function update() {
+      const next =
+        hovered ??
+        items.find((item) => item.matches(':focus-visible')) ??
+        items.find((item) =>
+          item.matches('[aria-current]:not([aria-current="false"])'),
+        ) ??
+        items[0];
+      if (next === target) return;
+      const now = performance.now();
+      origin = target ? current : new Map([[next, 1]]);
+      started = target && !reduced.matches ? now : now - duration;
+      target = next;
+      cancelAnimationFrame(frame);
+      paint(now);
+      group.dataset.pillReady = '';
+    }
+    function itemAt(event: PointerEvent) {
+      hovered =
+        event.pointerType === 'touch'
+          ? undefined
+          : items.find((item) => item.contains(event.target as Node));
+      update();
+    }
+    group.addEventListener('pointerover', itemAt);
+    group.addEventListener('pointermove', itemAt);
+    group.addEventListener('pointerleave', () => {
+      hovered = undefined;
+      update();
+    });
+    group.addEventListener('pointercancel', () => {
+      hovered = undefined;
+      update();
+    });
+    group.addEventListener('focusin', update);
+    group.addEventListener('focusout', () => queueMicrotask(update));
+    // Keyboard input takes over from a stationary mouse; touch leaves no sticky hover.
+    document.addEventListener('keydown', () => {
+      hovered = undefined;
+      update();
+    });
+    reduced.addEventListener('change', schedule);
+    const resize = new ResizeObserver(schedule);
+    resize.observe(group);
+    items.forEach((item) => resize.observe(item));
+    const selection = new MutationObserver(update);
+    selection.observe(group, {
+      subtree: true,
+      attributes: true,
+      attributeFilter: ['aria-current'],
+    });
+    update();
+  }
+  function initializeHeader() {
+    applyTheme();
+    requestAnimationFrame(() => {
+      document.documentElement.dataset.themeReady = '';
+    });
+    const section = location.pathname.startsWith(blogUrl('tags'))
+      ? 'tags'
+      : location.pathname.startsWith(blogUrl('search'))
+        ? 'search'
+        : 'blog';
+    document.querySelectorAll<HTMLElement>('[data-nav]').forEach((link) => {
+      if (link.dataset.nav === section)
+        link.setAttribute('aria-current', 'page');
+      else link.removeAttribute('aria-current');
+    });
+  }
+  document.addEventListener('astro:after-swap', () => applyTheme());
+  document.addEventListener('astro:page-load', initializeHeader);
+  initializePill(header.querySelector<HTMLElement>('[data-pill-group]')!);
+  initializeHeader();
+</script>

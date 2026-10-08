@@ -39,7 +39,7 @@ pnpm test:browser          # Single-port navigation, app behavior and no hot rel
 - [Architecture](docs/architecture.md): stack decisions and source-only policy.
 - [Deployment and maintenance](docs/maintenance.md): Pages setup, verification and rollback.
 
-Edit `components/blog/src/config/site.mjs` for the blog's origin, base path, name, and description. Its `blogUrl()` and `absoluteUrl()` helpers keep navigation, feeds, and canonical URLs consistent. Blog appearance remains in `components/blog/src/config/appearance.ts`.
+Edit `components/blog/src/config/site.ts` for the blog's origin, base path, name, and description. Its `blogUrl()` and `absoluteUrl()` helpers keep navigation, feeds, and canonical URLs consistent. Blog appearance remains in `components/blog/src/config/appearance.ts`.
 
 The blog's `github` setting controls its external profile button. Search is available at `/blog/search/` and indexes titles, summaries, and post contents during the build. Fixed interface text is translated in `components/blog/src/config/i18n.ts`; the language button switches between English and Simplified Chinese without translating posts or tags.
 

@@ -1,5 +1,5 @@
 import { getCollection, type CollectionEntry } from 'astro:content';
-import { blogUrl } from '../config/site.mjs';
+import { blogUrl } from '../config/site.ts';
 
 export async function publishedPosts() {
   return (
