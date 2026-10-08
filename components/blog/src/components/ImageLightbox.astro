@@ -1,0 +1,190 @@
+<dialog
+  class="image-lightbox"
+  aria-label="Image preview"
+  data-i18n-aria="lightbox.title"
+>
+  <div class="image-lightbox-backdrop" aria-hidden="true"></div>
+  <img class="image-lightbox-image" alt="" />
+  <button
+    class="image-lightbox-hint"
+    type="button"
+    autofocus
+    data-i18n="lightbox.close"
+  >
+    Click anywhere to close
+  </button>
+</dialog>
+
+<script>
+  let dispose: (() => void) | undefined;
+
+  function initializeLightbox() {
+    dispose?.();
+    dispose = undefined;
+    const dialog = document.querySelector<HTMLDialogElement>('.image-lightbox');
+    const preview = dialog?.querySelector<HTMLImageElement>('img');
+    const backdrop = dialog?.querySelector<HTMLElement>(
+      '.image-lightbox-backdrop',
+    );
+    const hint = dialog?.querySelector<HTMLButtonElement>(
+      '.image-lightbox-hint',
+    );
+    if (!dialog || !preview || !backdrop || !hint) return;
+
+    const controller = new AbortController();
+    const { signal } = controller;
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+    let source: HTMLImageElement | undefined;
+    let animations: Animation[] = [];
+    let closing = false;
+
+    const cancelMotion = () => {
+      animations.forEach((animation) => animation.cancel());
+      animations = [];
+    };
+
+    const reset = () => {
+      cancelMotion();
+      source?.removeAttribute('data-lightbox-source');
+      if (dialog.open) {
+        dialog.close();
+        source?.focus({ preventScroll: true });
+      }
+      source = undefined;
+      closing = false;
+      preview.removeAttribute('src');
+      preview.alt = '';
+    };
+
+    const move = (opening: boolean) => {
+      // Capture the live frame before canceling an interrupted opening animation.
+      const currentImage = getComputedStyle(preview).transform;
+      const currentBackdrop = getComputedStyle(backdrop).clipPath;
+      const currentHint = getComputedStyle(hint).opacity;
+      cancelMotion();
+      if (!source || reduced.matches) return [];
+
+      const from = source.getBoundingClientRect();
+      const to = preview.getBoundingClientRect();
+      const bounds = backdrop.getBoundingClientRect();
+      if (!from.width || !from.height || !to.width || !to.height) return [];
+
+      const thumbnail = `translate(${from.left - to.left}px, ${from.top - to.top}px)
+        scale(${from.width / to.width}, ${from.height / to.height})`;
+      const covered = `inset(${from.top - bounds.top}px
+        ${bounds.right - from.right}px ${bounds.bottom - from.bottom}px
+        ${from.left - bounds.left}px round 14px)`;
+      const expanded = 'inset(0px 0px 0px 0px round 0px)';
+      const options: KeyframeAnimationOptions = {
+        duration: opening ? 440 : 280,
+        easing: opening
+          ? getComputedStyle(dialog).getPropertyValue('--ease').trim()
+          : 'ease-in-out',
+        fill: 'both',
+      };
+      animations = [
+        preview.animate(
+          [
+            { transform: opening ? thumbnail : currentImage },
+            { transform: opening ? 'none' : thumbnail },
+          ],
+          options,
+        ),
+        backdrop.animate(
+          [
+            { clipPath: opening ? covered : currentBackdrop },
+            { clipPath: opening ? expanded : covered },
+          ],
+          options,
+        ),
+        hint.animate(
+          opening
+            ? [{ opacity: 0 }, { opacity: 0, offset: 0.35 }, { opacity: 1 }]
+            : [{ opacity: currentHint }, { opacity: 0 }],
+          options,
+        ),
+      ];
+      return animations.map((animation) => animation.finished.catch(() => {}));
+    };
+
+    const close = async () => {
+      if (!dialog.open || closing) return;
+      closing = true;
+      await Promise.all(move(false));
+      if (!signal.aborted && closing) reset();
+    };
+
+    const open = async (image: HTMLImageElement) => {
+      const src = image.currentSrc || image.src;
+      if (!src || dialog.open) return;
+      source = image;
+      preview.src = src;
+      preview.alt = image.alt;
+      // The intrinsic size must be ready before measuring the enlarged image.
+      await preview.decode().catch(() => {});
+      if (source !== image || signal.aborted || dialog.open) return;
+      dialog.showModal();
+      source.dataset.lightboxSource = '';
+      move(true);
+    };
+
+    document
+      .querySelectorAll<HTMLImageElement>('.prose img')
+      .forEach((image) => {
+        image.tabIndex = 0;
+        image.setAttribute('role', 'button');
+        image.setAttribute('aria-haspopup', 'dialog');
+        // Keep the image's description as its accessible name when available.
+        if (!image.alt) {
+          image.dataset.i18nAria = 'lightbox.title';
+          image.setAttribute(
+            'aria-label',
+            window.__blogLocale?.text('lightbox.title') ?? 'Image preview',
+          );
+        }
+        image.addEventListener(
+          'click',
+          (event) => {
+            // Linked images open the preview without following the enclosing link.
+            event.preventDefault();
+            event.stopPropagation();
+            open(image);
+          },
+          { signal },
+        );
+        image.addEventListener(
+          'keydown',
+          (event) => {
+            if (event.key !== 'Enter' && event.key !== ' ') return;
+            event.preventDefault();
+            open(image);
+          },
+          { signal },
+        );
+      });
+
+    dialog.addEventListener('click', close, { signal });
+    dialog.addEventListener(
+      'cancel',
+      (event) => {
+        event.preventDefault();
+        close();
+      },
+      { signal },
+    );
+    const settle = () => {
+      if (closing) reset();
+      else cancelMotion();
+    };
+    window.addEventListener('resize', settle, { signal });
+    reduced.addEventListener('change', settle, { signal });
+    dispose = () => {
+      controller.abort();
+      reset();
+    };
+  }
+
+  document.addEventListener('astro:before-swap', () => dispose?.());
+  document.addEventListener('astro:page-load', initializeLightbox);
+  initializeLightbox();
+</script>
