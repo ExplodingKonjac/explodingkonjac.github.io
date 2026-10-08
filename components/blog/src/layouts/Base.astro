@@ -1,5 +1,5 @@
 ---
-import { componentUrl, site, absoluteUrl } from '@site/config';
+import { blogUrl, site, absoluteUrl } from '../config/site.mjs';
 import { ClientRouter } from 'astro:transitions';
 import Background from '../components/Background.astro';
 import GlassSurface from '../components/GlassSurface.astro';
@@ -25,7 +25,7 @@ const {
 } = Astro.props;
 const pageTitle = `${title} · ${site.name}`;
 const canonical = absoluteUrl(Astro.url.pathname);
-const tagsActive = Astro.url.pathname.startsWith(componentUrl('blog', 'tags'));
+const tagsActive = Astro.url.pathname.startsWith(blogUrl('tags'));
 ---
 
 <!doctype html>
@@ -73,7 +73,7 @@ const tagsActive = Astro.url.pathname.startsWith(componentUrl('blog', 'tags'));
       rel="alternate"
       type="application/rss+xml"
       title={`${site.name}'s blog`}
-      href={componentUrl('blog', 'rss.xml')}
+      href={blogUrl('rss.xml')}
     />
     <title>{pageTitle}</title>
   </head>
@@ -105,14 +105,14 @@ const tagsActive = Astro.url.pathname.startsWith(componentUrl('blog', 'tags'));
         >
           <GlassSurface />
           <div class="header-inner">
-            <a href={componentUrl('blog')} class="wordmark">
+            <a href={blogUrl()} class="wordmark">
               {site.name}
               <span aria-hidden="true">.</span>
             </a>
             <div class="header-controls">
               <nav aria-label="Main navigation" data-pill-group>
                 <a
-                  href={componentUrl('blog')}
+                  href={blogUrl()}
                   data-nav="blog"
                   data-pill-item
                   aria-current={!tagsActive ? 'page' : undefined}
@@ -120,18 +120,14 @@ const tagsActive = Astro.url.pathname.startsWith(componentUrl('blog', 'tags'));
                   Blog
                 </a>
                 <a
-                  href={componentUrl('blog', 'tags')}
+                  href={blogUrl('tags')}
                   data-nav="tags"
                   data-pill-item
                   aria-current={tagsActive ? 'page' : undefined}
                 >
                   Tags
                 </a>
-                <a
-                  href={componentUrl('blog', 'rss.xml')}
-                  data-astro-reload
-                  data-pill-item
-                >
+                <a href={blogUrl('rss.xml')} data-astro-reload data-pill-item>
                   RSS
                 </a>
               </nav>

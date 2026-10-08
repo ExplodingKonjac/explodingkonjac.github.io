@@ -11,7 +11,7 @@ import {
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { assemble, validateRegistry } from './assemble.mjs';
-import { components } from '@site/config';
+import { components } from './components.mjs';
 
 async function fixture(t) {
   const root = await mkdtemp(path.join(tmpdir(), 'pages-assembly-'));
@@ -43,6 +43,10 @@ test('assembles every component and clears stale output', async (t) => {
   assert.match(
     await readFile(path.join(output, '404.html'), 'utf8'),
     /href="\/blog\/"/,
+  );
+  assert.equal(
+    await readFile(path.join(output, 'robots.txt'), 'utf8'),
+    'User-agent: *\nAllow: /\nSitemap: https://explodingkonjac.github.io/blog/sitemap-index.xml\n',
   );
 });
 test('missing builds fail before clearing the previous assembly', async (t) => {

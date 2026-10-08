@@ -8,9 +8,6 @@
     "build": "vite build",
     "preview": "vite preview"
   },
-  "dependencies": {
-    "@site/config": "workspace:*"
-  },
   "devDependencies": {
     "vite": "8.3.3"
   }

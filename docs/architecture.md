@@ -2,15 +2,19 @@
 
 ## Independent packages, one deployment
 
-`components/` contains deployable projects; `packages/` contains shared source or configuration. The workspace includes `components/*`, `components/app/*`, and `packages/*`. Category directories do not have manifests.
+`components/` contains deployable projects; `packages/` is reserved for libraries shared by multiple consumers. The workspace includes `components/*`, `components/app/*`, and `packages/*`. Category directories do not have manifests.
 
 Astro owns the blog's static routes and content pipeline. Vite owns the HTML homepage and existing app. New apps default to Vite and TypeScript; add a framework when useful. Plain CSS and custom properties keep presentation easy to change.
 
-Packages are private and uniquely named. Dependencies belong to the packages consuming them. Local dependencies use `workspace:*`; the repository commits one lockfile. Shared `@site/config` exports source ESM without a build step.
+Packages are private and uniquely named. Dependencies belong to the packages consuming them. Local dependencies use `workspace:*`; the repository commits one lockfile. Site metadata stays with its owning component; there is no shared site-configuration package.
 
 ## URLs and outputs
 
-The registry in `packages/site-config/index.mjs` defines the origin, identity, directories, descriptions and mounts. The homepage generates project links from it during Vite's HTML transform, so navigation works without client JavaScript. Components derive their framework base from the registry.
+The blog owns its origin, base path, identity, and URL helpers in `components/blog/src/config/site.mjs`. Astro configuration, templates, feeds, and browser code all use that module. It contains no registry of sibling components or homepage profile links.
+
+The homepage owns its metadata and project descriptions in `components/home/site.mjs`. Vite renders these into HTML, so navigation works without client JavaScript. Other apps set their own framework base paths. Homepage project links are curated independently of deployment entries.
+
+The build-only registry in `scripts/components.mjs` lists package names, source directories, mounts, and labels for 404 recovery links. It reads the blog's base path from the blog config; no component imports the registry. The assembler uses the homepage's name for the root 404 and the blog's URL helpers for its sitemap reference. Verification uses the homepage's origin to identify links within the deployed site.
 
 Components build to local `dist/`. The assembler validates every output before clearing `_site/`, then copies the homepage to the root and other components beneath their mounts. It rejects duplicate or overlapping mounts, missing indexes, reserved-path conflicts, generated-file collisions and symlinks. It writes the root 404 page, robots file and `.nojekyll` marker.
 

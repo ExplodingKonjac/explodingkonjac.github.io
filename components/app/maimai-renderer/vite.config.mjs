@@ -1,8 +1,7 @@
 import { defineConfig } from 'vite';
-import { component } from '@site/config';
 
 export default defineConfig({
-  base: component('maimai-renderer').mount,
+  base: '/app/maimai-renderer/',
   appType: 'mpa',
   server: { strictPort: true, hmr: false, ws: false, watch: null },
 });

@@ -2,7 +2,8 @@ import { readFile, readdir, stat } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { load } from 'cheerio';
-import { components, site } from '@site/config';
+import { components } from './components.mjs';
+import { site } from '../components/home/site.mjs';
 import { repoRoot } from './assemble.mjs';
 
 async function pages(root, prefix = '') {
@@ -19,6 +20,9 @@ async function pages(root, prefix = '') {
 
 export async function verifySite(root = path.join(repoRoot, '_site')) {
   const errors = [];
+  const blogRoot = components
+    .find((entry) => entry.id === 'blog')
+    .mount.slice(1);
   const documents = new Map();
   const ids = new Map();
   async function checkLink(reference, source) {
@@ -87,7 +91,7 @@ export async function verifySite(root = path.join(repoRoot, '_site')) {
       });
       for (const reference of references) await checkLink(reference, file);
       if (
-        file.startsWith('blog/') &&
+        file.startsWith(blogRoot) &&
         $('meta[name="robots"]').attr('content')?.includes('noindex')
       )
         errors.push(`${file}: draft page in production output`);
@@ -105,8 +109,8 @@ export async function verifySite(root = path.join(repoRoot, '_site')) {
   }
   for (const entry of components) await checkLink(entry.mount, 'index.html');
   for (const file of [
-    'blog/rss.xml',
-    'blog/sitemap-index.xml',
+    `${blogRoot}rss.xml`,
+    `${blogRoot}sitemap-index.xml`,
     '404.html',
     'robots.txt',
   ]) {

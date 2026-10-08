@@ -1,5 +1,5 @@
 import { getCollection, type CollectionEntry } from 'astro:content';
-import { componentUrl } from '@site/config';
+import { blogUrl } from '../config/site.mjs';
 
 export async function publishedPosts() {
   return (
@@ -15,11 +15,11 @@ export async function publishedPosts() {
 }
 
 export function postUrl(post: CollectionEntry<'posts'>) {
-  return componentUrl('blog', 'posts', post.id);
+  return blogUrl('posts', post.id);
 }
 
 export function tagUrl(tag: string) {
-  return componentUrl('blog', 'tags', tag);
+  return blogUrl('tags', tag);
 }
 
 export function formatDate(date: Date) {

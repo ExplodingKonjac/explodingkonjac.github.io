@@ -13,13 +13,10 @@
     "assemble": "node scripts/assemble.mjs",
     "preview": "node scripts/preview.mjs",
     "verify": "node scripts/verify-site.mjs",
-    "test": "node --test scripts/*.test.mjs components/blog/src/plugins/*.test.mjs",
+    "test": "node --test scripts/*.test.mjs components/blog/src/plugins/*.test.mjs components/blog/src/config/*.test.mjs",
     "test:browser": "playwright test",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
-  },
-  "dependencies": {
-    "@site/config": "workspace:*"
   },
   "devDependencies": {
     "@playwright/test": "1.63.0",

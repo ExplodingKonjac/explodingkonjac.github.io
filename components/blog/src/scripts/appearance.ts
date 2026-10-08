@@ -1,4 +1,4 @@
-import { componentUrl } from '@site/config';
+import { blogUrl } from '../config/site.mjs';
 import type { TransitionBeforeSwapEvent } from 'astro:transitions/client';
 import { themeStorageKey, type BackgroundConfig } from '../config/appearance';
 
@@ -147,7 +147,7 @@ function initializePage() {
   requestAnimationFrame(() => {
     document.documentElement.dataset.themeReady = '';
   });
-  const tagsActive = location.pathname.startsWith(componentUrl('blog', 'tags'));
+  const tagsActive = location.pathname.startsWith(blogUrl('tags'));
   document.querySelectorAll<HTMLElement>('[data-nav]').forEach((link) => {
     if ((link.dataset.nav === 'tags') === tagsActive)
       link.setAttribute('aria-current', 'page');

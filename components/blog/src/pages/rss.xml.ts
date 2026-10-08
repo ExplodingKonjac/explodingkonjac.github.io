@@ -1,12 +1,12 @@
 import rss from '@astrojs/rss';
-import { site, absoluteUrl, componentUrl } from '@site/config';
+import { site, absoluteUrl, blogUrl } from '../config/site.mjs';
 import { publishedPosts, postUrl } from '../lib/posts';
 
 export async function GET() {
   return rss({
     title: `${site.name}'s notebook`,
     description: site.description,
-    site: absoluteUrl(componentUrl('blog')),
+    site: absoluteUrl(blogUrl()),
     items: (await publishedPosts()).map((post) => ({
       title: post.data.title,
       description: post.data.description,

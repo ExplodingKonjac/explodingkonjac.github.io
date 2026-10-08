@@ -1,4 +1,4 @@
-import { componentUrl } from '@site/config';
+import { blogUrl } from './site.mjs';
 
 export type BackgroundSource =
   | { kind: 'asset'; src: string }
@@ -17,12 +17,9 @@ export const background: BackgroundConfig = {
   position: '50% 50%',
 };
 
-export const fallbackBackground = componentUrl(
-  'blog',
-  'backgrounds/aurora.svg',
-);
+export const fallbackBackground = blogUrl('backgrounds/aurora.svg');
 export const themeStorageKey = 'blog-appearance-theme';
 
 export function assetUrl(src: string): string {
-  return componentUrl('blog', src.replace(/^\/+/, ''));
+  return blogUrl(src.replace(/^\/+/, ''));
 }

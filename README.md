@@ -39,7 +39,9 @@ pnpm test:browser          # Single-port navigation, app behavior and no hot rel
 - [Architecture](docs/architecture.md): stack decisions and source-only policy.
 - [Deployment and maintenance](docs/maintenance.md): Pages setup, verification and rollback.
 
-Edit `packages/site-config/index.mjs` to change the origin, identity, or component descriptions. Edit the introduction in `components/home/index.html`.
+Edit `components/blog/src/config/site.mjs` for the blog's origin, base path, name, and description. Its `blogUrl()` and `absoluteUrl()` helpers keep navigation, feeds, and canonical URLs consistent. Blog appearance remains in `components/blog/src/config/appearance.ts`.
+
+The homepage owns its identity and project links in `components/home/site.mjs`; its introduction lives in `components/home/index.html`. Deployment entries live in `scripts/components.mjs`. Changing blog metadata does not change the homepage or other apps.
 
 ## Publishing
 

@@ -1,7 +1,9 @@
 import { cp, lstat, mkdir, readdir, rm, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
-import { components, site, absoluteUrl, componentUrl } from '@site/config';
+import { components } from './components.mjs';
+import { site } from '../components/home/site.mjs';
+import { absoluteUrl, blogUrl } from '../components/blog/src/config/site.mjs';
 
 export const repoRoot = fileURLToPath(new URL('../', import.meta.url));
 
@@ -127,7 +129,7 @@ export async function assemble(root = repoRoot, registry = components) {
   await writeFile(path.join(output, '.nojekyll'), '');
   await writeFile(
     path.join(output, 'robots.txt'),
-    `User-agent: *\nAllow: /\nSitemap: ${absoluteUrl(componentUrl('blog', 'sitemap-index.xml'))}\n`,
+    `User-agent: *\nAllow: /\nSitemap: ${absoluteUrl(blogUrl('sitemap-index.xml'))}\n`,
   );
   return output;
 }
