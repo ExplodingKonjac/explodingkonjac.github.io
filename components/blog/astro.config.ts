@@ -11,6 +11,7 @@ import type { Plugin } from 'unified';
 import { site } from './src/config/site.ts';
 import environments from './src/plugins/environments.ts';
 import references from './src/plugins/references.ts';
+import codeBlocks from './src/plugins/code-blocks.ts';
 import { mathMacros } from './src/plugins/math-macros.ts';
 
 const headingLinks: Plugin<[], Root> = () => (tree) => {
@@ -57,6 +58,9 @@ export default defineConfig({
         headingLinks,
       ],
     }),
-    shikiConfig: { themes: { light: 'github-light', dark: 'github-dark' } },
+    shikiConfig: {
+      themes: { light: 'github-light', dark: 'github-dark' },
+      transformers: [codeBlocks],
+    },
   },
 });

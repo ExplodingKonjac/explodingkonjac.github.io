@@ -57,10 +57,7 @@ First [@other2025]. Together [@something2024, @other2025]. Again [@other2025].
       '#reference-other2025',
     ],
   );
-  assert.equal(
-    $('.environment-reference > .environment-title').text(),
-    'References',
-  );
+  assert.equal($('.environment-reference > .environment-title').length, 0);
   assert.equal($('.reference-list').prop('tagName'), 'OL');
   assert.deepEqual(
     $('.reference-list > li')
@@ -92,10 +89,7 @@ See [@author:2024, @other-2025.v2].
 :::
 `),
   );
-  assert.equal(
-    $('#reading > .environment-title').text(),
-    'References — Further reading',
-  );
+  assert.equal($('#reading > .environment-title').text(), 'Further reading');
   assert.equal($('#reading .reference-entry strong').text(), 'Author（2024）');
   assert.equal(
     $('#reading .reference-entry a').attr('href'),

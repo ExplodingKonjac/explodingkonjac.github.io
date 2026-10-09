@@ -69,12 +69,16 @@ const environments: Plugin<[], Root> = () => (tree, file) => {
     if (node.name === 'figure') {
       if (title)
         node.children.push({ ...title, data: { hName: 'figcaption' } });
-    } else {
+    } else if (node.name !== 'reference' || title) {
       const titleChildren = [
-        {
-          type: 'text' as const,
-          value: `${labels[node.name as keyof typeof labels]}${title ? ' — ' : ''}`,
-        },
+        ...(node.name === 'reference'
+          ? []
+          : [
+              {
+                type: 'text' as const,
+                value: `${labels[node.name as keyof typeof labels]}${title ? ' — ' : ''}`,
+              },
+            ]),
         ...(title?.children ?? []),
       ];
       node.children.unshift({
