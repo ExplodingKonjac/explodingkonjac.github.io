@@ -317,17 +317,18 @@ html:has(.image-lightbox[open]) {
 }
 .prose table {
   display: block;
+  width: fit-content;
   max-width: 100%;
   overflow-x: auto;
   border-collapse: collapse;
-  margin: 24px 0;
+  margin: 24px auto;
   font-size: 14px;
 }
 .prose th,
 .prose td {
   border-bottom: 1px solid var(--line);
   padding: 12px 16px;
-  text-align: left;
+  text-align: center;
 }
 .prose th {
   background: var(--inset);
@@ -451,17 +452,10 @@ details.environment {
 .citation a:focus-visible {
   background: var(--active);
 }
-.environment-reference {
-  margin-top: 40px;
-  padding: 24px 0 0;
-  border-width: 1px 0 0;
-  border-radius: 0;
-  background: transparent;
-  font-size: 14px;
-}
 .reference-list {
   margin: 16px 0 0;
   padding-left: 2.5em;
+  font-size: 14px;
 }
 .reference-list > li {
   margin: 8px 0;

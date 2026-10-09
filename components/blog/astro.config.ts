@@ -42,6 +42,11 @@ export default defineConfig({
   integrations: [sitemap()],
   markdown: {
     processor: unified({
+      remarkRehype: {
+        // Keep the accessible footnote description without a heading or TOC entry.
+        footnoteLabelTagName: 'span',
+        footnoteLabelProperties: { className: ['visually-hidden'] },
+      },
       remarkPlugins: [
         remarkCjkFriendly,
         remarkDirective,

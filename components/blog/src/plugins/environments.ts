@@ -1,4 +1,4 @@
-import { visit } from 'unist-util-visit';
+import { SKIP, visit } from 'unist-util-visit';
 import type { Paragraph, Root } from 'mdast';
 import type { Plugin } from 'unified';
 import { messages } from '../config/i18n.ts';
@@ -90,7 +90,7 @@ function calloutSummary(
 /** Render Markdown container directives without requiring JSX or client JavaScript. */
 const environments: Plugin<[], Root> = () => (tree, file) => {
   const ids = new Set<string>();
-  visit(tree, (node) => {
+  visit(tree, (node, index, parent) => {
     if (
       node.type !== 'containerDirective' &&
       node.type !== 'leafDirective' &&
@@ -124,6 +124,40 @@ const environments: Plugin<[], Root> = () => (tree, file) => {
       node.children[0].data?.directiveLabel
         ? (node.children.shift() as Paragraph)
         : null;
+    if (node.name === 'reference') {
+      if (title)
+        file.fail(
+          'Reference lists do not accept titles; write a Markdown heading before :::reference',
+          node,
+        );
+      const first = node.children[0];
+      if (first?.type !== 'list')
+        return file.fail('Reference lists must contain list entries', node);
+      if (parent && index !== undefined) {
+        parent.children[index] = {
+          ...first,
+          ordered: true,
+          children: node.children.flatMap((list) => {
+            if (list.type !== 'list')
+              return file.fail(
+                'Reference lists must contain list entries',
+                list,
+              );
+            return list.children;
+          }),
+          data: {
+            ...first.data,
+            hProperties: {
+              ...first.data?.hProperties,
+              ...(attributes.id ? { id: attributes.id } : {}),
+            },
+          },
+        };
+        // Revisit the replacement list so nested environments render normally.
+        return [SKIP, index];
+      }
+      return;
+    }
     const collapsible = Object.hasOwn(calloutIcons, node.name);
     node.data = {
       ...node.data,
@@ -142,16 +176,12 @@ const environments: Plugin<[], Root> = () => (tree, file) => {
     } else if (node.name === 'figure') {
       if (title)
         node.children.push({ ...title, data: { hName: 'figcaption' } });
-    } else if (node.name !== 'reference' || title) {
+    } else {
       const titleChildren = [
-        ...(node.name === 'reference'
-          ? []
-          : [
-              {
-                type: 'text' as const,
-                value: `${labels[node.name as keyof typeof labels]}${title ? ' — ' : ''}`,
-              },
-            ]),
+        {
+          type: 'text' as const,
+          value: `${labels[node.name as keyof typeof labels]}${title ? ' — ' : ''}`,
+        },
         ...(title?.children ?? []),
       ];
       node.children.unshift({
