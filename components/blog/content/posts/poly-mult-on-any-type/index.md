@@ -147,7 +147,7 @@ $\Phi_n(x)$ 是不可约的，证略。
 
 记 $\mathcal{I}_m=\mathcal{A}[\omega_m]/\Phi_m(\omega_m)$，然后写下我们的算法形式：
 
-:::note[递归子问题]
+:::info[递归子问题]
 给定 $A(\omega_m),B(\omega_m),m$，在 $\mathcal{I}_m$ 上计算 $A(\omega_m)\cdot B(\omega_m)$。
 
 :::
@@ -260,11 +260,15 @@ $$
 
 #### 参考文献
 
-- [1] quasisphere, Fast convolution for 64-bit integers. <https://codeforces.com/blog/entry/45298>.
+:::reference
 
-- [2] whx1003，如何在任意代数结构上做多项式乘法。<https://www.cnblogs.com/whx1003/p/16214952.html>。
+- [@quasisphere-64bit-convolution] quasisphere, Fast convolution for 64-bit integers. <https://codeforces.com/blog/entry/45298>.
 
-- [3] 彭雨翔，Introduction to Polynomials。
+- [@whx1003-polynomial-multiplication] whx1003，如何在任意代数结构上做多项式乘法。<https://www.cnblogs.com/whx1003/p/16214952.html>。
+
+- [@peng-polynomials] 彭雨翔，Introduction to Polynomials。
+
+:::
 
 #### 参考代码
 

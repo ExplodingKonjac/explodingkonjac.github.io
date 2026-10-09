@@ -16,7 +16,7 @@ export async function GET() {
       $(element).replaceWith($('<span></span>').text(formula));
     });
     $(
-      'script, style, .heading-anchor, .katex-html, .footnote-backref',
+      'script, style, .heading-anchor, .katex-html, .footnote-backref, .code-block-header',
     ).remove();
     $('p, div, li, h1, h2, h3, h4, h5, h6, pre, tr, td, th, br, figcaption')
       .before(' ')

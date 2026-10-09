@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="560" viewBox="0 0 1200 560" fill="none">
+  <title>A polyline through three points</title>
+  <desc>Points A, B, and C are joined by a blue line over a light coordinate grid.</desc>
+  <defs>
+    <linearGradient id="background" x1="0" y1="0" x2="1200" y2="560" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#edf3fc" />
+      <stop offset="1" stop-color="#e9e5f4" />
+    </linearGradient>
+    <pattern id="grid" width="80" height="80" patternUnits="userSpaceOnUse">
+      <path d="M80 0H0V80" stroke="#9baac8" stroke-opacity=".22" stroke-width="1" />
+    </pattern>
+  </defs>
+  <path fill="url(#background)" d="M0 0h1200v560H0z" />
+  <path fill="url(#grid)" d="M80 80h1040v400H80z" />
+  <g stroke="#8997b1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M120 80v360h980m-10-7 10 7-10 7M113 90l7-10 7 10" />
+  </g>
+  <path d="M280 360 600 160 920 280" stroke="#5478b4" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" />
+  <g fill="#5478b4" stroke="#f8faff" stroke-width="5">
+    <circle cx="280" cy="360" r="12" />
+    <circle cx="600" cy="160" r="12" />
+    <circle cx="920" cy="280" r="12" />
+  </g>
+  <g fill="#324b71" font-family="Georgia, serif" font-size="30" font-style="italic" text-anchor="middle">
+    <text x="280" y="328">A</text>
+    <text x="600" y="126">B</text>
+    <text x="920" y="248">C</text>
+    <text x="1110" y="480">x</text>
+    <text x="90" y="86">y</text>
+  </g>
+</svg>

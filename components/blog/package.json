@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "pnpm --workspace-root dev",
     "check": "astro check",
-    "build": "astro build",
+    "build": "astro build --force",
     "preview": "astro preview"
   },
   "dependencies": {
@@ -15,7 +15,9 @@
     "astro": "7.3.6",
     "cheerio": "1.2.0",
     "katex": "0.16.47",
+    "node-tikzjax": "1.0.5",
     "rehype-katex": "7.0.1",
+    "remark-cjk-friendly": "2.3.1",
     "remark-directive": "4.0.0",
     "remark-math": "6.0.0",
     "sharp": "0.35.5",
@@ -24,6 +26,8 @@
   "devDependencies": {
     "@astrojs/check": "0.9.10",
     "typescript": "6.0.3",
+    "mdast-util-from-markdown": "2.1.0",
+    "micromark-util-types": "2.0.3",
     "rehype-stringify": "10.0.1",
     "remark-parse": "11.0.0",
     "remark-rehype": "11.1.2",

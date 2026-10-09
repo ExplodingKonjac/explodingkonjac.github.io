@@ -1,0 +1,77 @@
+<script>
+  let dispose: (() => void) | undefined;
+
+  function initializeCodeBlocks() {
+    dispose?.();
+    const controller = new AbortController();
+    const { signal } = controller;
+    const cleanups: (() => void)[] = [];
+
+    document
+      .querySelectorAll<HTMLElement>('.prose .code-block')
+      .forEach((block) => {
+        const code = block.querySelector<HTMLElement>('pre > code');
+        const button = block.querySelector<HTMLButtonElement>('.code-copy');
+        const status = block.querySelector<HTMLElement>('.code-copy-status');
+        if (!code || !button || !status) return;
+        let timer = 0;
+        let copying = false;
+        const updateTitle = () => {
+          button.title = window.__blogLocale?.text('code.copy') ?? 'Copy code';
+        };
+        button.hidden = false;
+        updateTitle();
+        document.addEventListener('blog:language-change', updateTitle, {
+          signal,
+        });
+
+        button.addEventListener(
+          'click',
+          async () => {
+            if (copying) return;
+            copying = true;
+            button.setAttribute('aria-busy', 'true');
+            clearTimeout(timer);
+            let state: 'copied' | 'error' = 'copied';
+            try {
+              await navigator.clipboard.writeText(code.textContent ?? '');
+            } catch {
+              state = 'error';
+            } finally {
+              copying = false;
+            }
+            if (signal.aborted) return;
+            button.removeAttribute('aria-busy');
+            block.dataset.copyState = state;
+            const key = state === 'copied' ? 'code.copied' : 'code.error';
+            status.dataset.i18n = key;
+            status.textContent =
+              window.__blogLocale?.text(key) ??
+              (state === 'copied' ? 'Copied' : 'Copy failed');
+            timer = window.setTimeout(
+              () => {
+                delete block.dataset.copyState;
+              },
+              state === 'copied' ? 2000 : 3000,
+            );
+          },
+          { signal },
+        );
+
+        cleanups.push(() => {
+          clearTimeout(timer);
+          delete block.dataset.copyState;
+          button.removeAttribute('aria-busy');
+        });
+      });
+
+    dispose = () => {
+      controller.abort();
+      cleanups.forEach((cleanup) => cleanup());
+    };
+  }
+
+  document.addEventListener('astro:before-swap', () => dispose?.());
+  document.addEventListener('astro:page-load', initializeCodeBlocks);
+  initializeCodeBlocks();
+</script>

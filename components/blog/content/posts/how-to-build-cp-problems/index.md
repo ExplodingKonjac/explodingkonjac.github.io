@@ -224,7 +224,7 @@ Makefile 判断目标是否需要构建的方式是：文件系统会储存文�
 
 我们假设你在 Linux 下工作，或者在 Windows 下使用 WSL，或者使用 Unix 风格的 shell（比如 mingw, msys 或者更加重量级的 cygwin）并带有 GNU make 工具。
 
-:::note[Windows 环境]
+:::info[Windows 环境]
 对于 OIer 而言，我们一般下载下来的 mingw 压缩包（比如从 [winlibs](https://winlibs.com/) 下载）里面有一个 `mingw32-make.exe`。添加环境变量后，你可以直接用 `mingw32-make.exe` 代替后文中的 `make`。同时由于没有完整的类 Unix shell 环境，你只能使用命令提示符 `cmd.exe` 中的命令，请自行判定其和 Linux 命令的区别。
 
 :::

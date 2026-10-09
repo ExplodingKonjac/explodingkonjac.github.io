@@ -105,7 +105,7 @@ Top Tree 是关于边的划分，而我们时常需要维护点的信息。为�
 - $\operatorname{link}(u,v)$：在 $u,v$ 间连一条边，需要使得操作完仍然是森林。
 - $\operatorname{cut}(u,v)$：断开 $u,v$ 间的边。
 
-常见的实现动态 Top Tree 的方式是由 Tarjan 和 Werneck 在 2005 年的论文 [Self Adjusting Top Trees](https://renatowerneck.files.wordpress.com/2016/06/tw05-self-adjusting-top-tree.pdf) 中提出的 SATT。由于其较为复杂且应用场景偏少，将在后续章节单独讨论~~（也可能不讨论）~~。
+常见的实现动态 Top Tree 的方式是由 Tarjan 和 Werneck 在 2005 年的论文 Self Adjusting Top Trees [@tarjan-werneck-2005] 中提出的 SATT。由于其较为复杂且应用场景偏少，将在后续章节单独讨论~~（也可能不讨论）~~。
 
 ### 簇与 Top Tree 的性质
 
@@ -579,7 +579,7 @@ Top Tree 的深度不被保证，因此截取子树的方法不再使用。
 
 $n\le 10^5,q\le 3\times 10^4$。
 
-解法自己看参考资料 [2]。
+解法自己看参考资料 [@chengsiyuan-2023]。
 
 复杂度为 $O\left((q\sqrt n+n)\log^3 n\right)$ 或 $O\left(\dfrac{nq}{w}+q\sqrt n\log n\right)$。
 
@@ -603,8 +603,12 @@ $n\le 10^5,q\le 3\times 10^4$。
 
 实际上资料很少，下面已经是能找到的大部分有用资料了。
 
-- [1] Robert E. Tarjan, Renato F. Werneck. Self-Adjusting Top Trees, 2005.
-- [2] 程思元。《浅谈静态 Top Tree 在树和广义串并联图上的应用》，2023 国家集训队论文集。
-- [3] 周欣。《浅谈一类树分块的构建算法及其应用》，2021 国家集训队论文集。
-- [4] negiizhao。《Top tree 相关东西的理论、用法和实现》，<https://negiizhao.blog.uoj.ac/blog/4912>。
-- [5] negiizhao。《用于仙人掌的 Top Trees》，<https://zhuanlan.zhihu.com/p/32413108>。
+:::reference
+
+- [@tarjan-werneck-2005] Robert E. Tarjan, Renato F. Werneck. [Self-Adjusting Top Trees](https://renatowerneck.files.wordpress.com/2016/06/tw05-self-adjusting-top-tree.pdf), 2005.
+- [@chengsiyuan-2023] 程思元。《浅谈静态 Top Tree 在树和广义串并联图上的应用》，2023 国家集训队论文集。
+- [@zhouxin-2021] 周欣。《浅谈一类树分块的构建算法及其应用》，2021 国家集训队论文集。
+- [@negiizhao-top-tree] negiizhao。《Top tree 相关东西的理论、用法和实现》，<https://negiizhao.blog.uoj.ac/blog/4912>。
+- [@negiizhao-cactus-top-trees] negiizhao。《用于仙人掌的 Top Trees》，<https://zhuanlan.zhihu.com/p/32413108>。
+
+:::

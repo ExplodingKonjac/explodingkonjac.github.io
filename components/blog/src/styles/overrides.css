@@ -106,6 +106,7 @@
 [data-theme-ready] .post-date,
 [data-theme-ready] .post-card p,
 [data-theme-ready] .toc h2,
+[data-theme-ready] .environment,
 [data-theme-ready] .environment-title,
 [data-theme-ready] .tag-count {
   transition:
