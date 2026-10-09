@@ -23,7 +23,10 @@
   --control-border: rgb(83 106 143 / 22%);
   --control-highlight: rgb(255 255 255 / 60%);
   --control-shadow: 0 3px 10px -5px rgb(36 54 89 / 16%);
+  --info: #3666a2;
+  --success: #28724d;
   --warning: #935123;
+  --error: #ae3f51;
   --radius: 28px;
   --blur: 8px;
   /* Blur eases from 25% at the rim to full strength across this distance. */
@@ -65,7 +68,10 @@
   --control-border: rgb(190 213 249 / 24%);
   --control-highlight: rgb(223 237 255 / 36%);
   --control-shadow: 0 3px 10px -5px rgb(3 9 21 / 28%);
+  --info: #a8c9ff;
+  --success: #91d5aa;
   --warning: #f1bd94;
+  --error: #f2a2aa;
   background: #141d30;
 }
 /* System theme when scripts are unavailable. */
@@ -92,7 +98,10 @@
     --control-border: rgb(190 213 249 / 24%);
     --control-highlight: rgb(223 237 255 / 36%);
     --control-shadow: 0 3px 10px -5px rgb(3 9 21 / 28%);
+    --info: #a8c9ff;
+    --success: #91d5aa;
     --warning: #f1bd94;
+    --error: #f2a2aa;
     background: #141d30;
   }
 }

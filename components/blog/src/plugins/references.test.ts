@@ -112,7 +112,7 @@ See [@author:2024, @other-2025.v2].
 test('supports citations in formatted text and nested environments', async () => {
   const $ = load(
     await html(`
-::::note
+::::info
 **See [@article] for details.**
 
 :::reference
@@ -121,8 +121,8 @@ test('supports citations in formatted text and nested environments', async () =>
 ::::
 `),
   );
-  assert.equal($('.environment-note strong .citation').text(), '[1]');
-  assert.equal($('.environment-note .reference-entry').length, 1);
+  assert.equal($('.environment-info strong .citation').text(), '[1]');
+  assert.equal($('.environment-info .reference-entry').length, 1);
 });
 
 test('keeps code, math, escapes, and ordinary Markdown links intact', async () => {

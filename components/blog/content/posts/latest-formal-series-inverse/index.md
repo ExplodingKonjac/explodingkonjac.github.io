@@ -8,7 +8,7 @@ draft: false
 
 ## 声明
 
-:::note[来源说明]
+:::info[来源说明]
 本文大部分译自参考文献 [@noshi91-2024-fps-composition]，还有一些自己的理解和补充。
 
 :::

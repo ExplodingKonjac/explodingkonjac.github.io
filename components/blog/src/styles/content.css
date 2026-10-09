@@ -367,6 +367,19 @@ html:has(.image-lightbox[open]) {
 }
 details.environment {
   --environment-duration: 320ms;
+  border-color: color-mix(in srgb, var(--environment-accent) 45%, transparent);
+}
+.environment-info {
+  --environment-accent: var(--info);
+}
+.environment-success {
+  --environment-accent: var(--success);
+}
+.environment-warning {
+  --environment-accent: var(--warning);
+}
+.environment-error {
+  --environment-accent: var(--error);
 }
 .environment[data-environment-motion] {
   overflow: clip;
@@ -377,10 +390,20 @@ details.environment {
 .environment > summary.environment-title {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: 12px;
+  min-height: 24px;
+  color: var(--environment-accent);
   cursor: pointer;
   list-style: none;
+}
+.environment-icon {
+  flex: 0 0 20px;
+  width: 20px;
+  height: 20px;
+}
+.environment > summary.environment-title > strong {
+  flex: 1;
+  min-width: 0;
 }
 .environment > summary.environment-title::-webkit-details-marker {
   display: none;
@@ -390,6 +413,7 @@ details.environment {
   flex: 0 0 6px;
   width: 6px;
   height: 6px;
+  margin-left: auto;
   margin-right: 2px;
   border-right: 1.5px solid currentColor;
   border-bottom: 1.5px solid currentColor;
@@ -402,12 +426,6 @@ details.environment {
 }
 .environment-proof {
   background: transparent;
-}
-.environment-warning {
-  border-color: color-mix(in srgb, var(--warning) 35%, transparent);
-}
-.environment-warning .environment-title {
-  color: var(--warning);
 }
 .proof-end {
   text-align: right;
