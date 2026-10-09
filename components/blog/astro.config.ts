@@ -12,6 +12,7 @@ import { site } from './src/config/site.ts';
 import environments from './src/plugins/environments.ts';
 import references from './src/plugins/references.ts';
 import codeBlocks from './src/plugins/code-blocks.ts';
+import tikz from './src/plugins/tikz.ts';
 import { mathMacros } from './src/plugins/math-macros.ts';
 
 const headingLinks: Plugin<[], Root> = () => (tree) => {
@@ -47,6 +48,7 @@ export default defineConfig({
         remarkMath,
         references,
         environments,
+        tikz,
       ],
       rehypePlugins: [
         [
