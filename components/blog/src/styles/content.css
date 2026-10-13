@@ -11,6 +11,13 @@
 .prose > :last-child {
   margin-bottom: 0;
 }
+.prose strong,
+.prose b,
+.prose em,
+.prose i {
+  /* CJK fallback fonts may lack bold or italic faces. */
+  font-synthesis: weight style;
+}
 .toc {
   position: sticky;
   top: var(--anchor-offset);
