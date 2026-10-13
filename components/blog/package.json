@@ -14,7 +14,7 @@
     "@astrojs/sitemap": "3.7.4",
     "astro": "7.3.8",
     "cheerio": "1.2.0",
-    "katex": "0.19.0",
+    "katex": "catalog:",
     "node-tikzjax": "1.0.5",
     "rehype-katex": "7.0.1",
     "remark-cjk-friendly": "2.3.2",

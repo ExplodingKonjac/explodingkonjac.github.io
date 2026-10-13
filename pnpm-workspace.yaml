@@ -3,6 +3,13 @@ packages:
   - components/app/*
   - packages/*
 
+catalog:
+  katex: 0.19.0
+
+overrides:
+  # Keep rehype-katex's renderer aligned with the blog's stylesheet.
+  rehype-katex>katex: 'catalog:'
+
 allowBuilds:
   esbuild: true
   sharp: true
