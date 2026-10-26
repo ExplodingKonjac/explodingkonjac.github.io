@@ -9,22 +9,22 @@
     "preview": "astro preview"
   },
   "dependencies": {
-    "@astrojs/markdown-remark": "7.3.2",
+    "@astrojs/markdown-remark": "7.3.4",
     "@astrojs/rss": "4.0.19",
     "@astrojs/sitemap": "3.7.4",
-    "astro": "7.3.8",
+    "astro": "7.4.2",
     "cheerio": "1.2.0",
     "katex": "catalog:",
     "node-tikzjax": "1.0.5",
     "rehype-katex": "7.0.1",
-    "remark-cjk-friendly": "2.3.2",
+    "remark-cjk-friendly": "2.3.3",
     "remark-directive": "4.0.0",
     "remark-math": "6.0.0",
     "sharp": "0.35.5",
     "unist-util-visit": "5.1.0"
   },
   "devDependencies": {
-    "@astrojs/check": "0.9.10",
+    "@astrojs/check": "0.9.12",
     "typescript": "6.0.3",
     "mdast-util-from-markdown": "2.1.0",
     "micromark-util-types": "2.0.3",
@@ -34,6 +34,6 @@
     "unified": "11.0.5",
     "@types/hast": "3.0.5",
     "@types/mdast": "4.0.4",
-    "@types/node": "26.6.4"
+    "@types/node": "26.6.5"
   }
 }
