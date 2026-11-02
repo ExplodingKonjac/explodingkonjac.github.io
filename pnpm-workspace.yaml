@@ -4,7 +4,7 @@ packages:
   - packages/*
 
 catalog:
-  katex: 0.19.0
+  katex: 0.19.1
 
 overrides:
   # Keep rehype-katex's renderer aligned with the blog's stylesheet.
